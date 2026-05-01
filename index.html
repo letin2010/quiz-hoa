@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Hóa Học – Oxi hóa – Khử & Tốc độ Phản ứng</title>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+    onload="document.addEventListener('DOMContentLoaded', () => renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]}))"></script>
+  <style>
+    :root {
+      --bg: #0a0e17; --surface: #111827; --surface2: #151f30; --border: #1f2d45;
+      --accent: #4f8ef7; --accent2: #7ab3ff; --gold: #4f8ef7; --gold2: #7ab3ff;
+      --red: #f85149; --green: #3fb950; --text: #e2e8f0; --muted: #94a3b8; --radius: 14px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
+    body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(79,142,247,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(79,142,247,0.03) 1px,transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+    .glow { position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, rgba(79,142,247,0.1) 0%, rgba(79,142,247,0.03) 40%, transparent 70%); border-radius: 50%; z-index: 0; pointer-events: none; transform: translate(-50%,-50%); left: 50%; top: 50%; transition: left 0.08s ease, top 0.08s ease; }
+    .screen { display: none; width: 100%; max-width: 920px; padding: 24px 16px 60px; position: relative; z-index: 1; }
+    .screen.active { display: block; }
+    #start-screen { text-align: center; padding-top: 60px; }
+    .logo-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(79,142,247,0.1); border: 1px solid rgba(79,142,247,0.4); border-radius: 999px; padding: 6px 16px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; color: var(--accent2); text-transform: uppercase; margin-bottom: 28px; animation: fadeDown 0.8s ease both; }
+    h1.main-title { font-family: 'Libre Baskerville', serif; font-size: clamp(2rem,5vw,3.4rem); font-weight: 900; line-height: 1.15; background: linear-gradient(135deg,#fff 0%,var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 12px; animation: fadeDown 0.9s 0.1s ease both; }
+    .subtitle { color: var(--muted); font-size: 1rem; margin-bottom: 36px; animation: fadeDown 1s 0.2s ease both; }
+    @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    .stats-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 36px; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 22px; text-align: center; min-width: 110px; transition: border-color 0.3s; }
+    .stat-card:hover { border-color: rgba(79,142,247,0.4); }
+    .stat-card .num { font-family: 'Libre Baskerville', serif; font-size: 1.9rem; font-weight: 700; color: var(--accent); }
+    .stat-card .lbl { font-size: 0.73rem; color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .btn-start { background: linear-gradient(135deg,#4f8ef7,#7ab3ff); color: #0a0e17; border: none; border-radius: var(--radius); padding: 16px 48px; font-size: 1.05rem; font-weight: 700; font-family: 'DM Sans',sans-serif; cursor: pointer; transition: all 0.2s; letter-spacing: 0.03em; animation: fadeDown 1s 0.3s ease both; margin-top: 10px; }
+    .btn-start:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(79,142,247,0.4); }
+    #quiz-screen { padding-top: 20px; }
+    .quiz-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; gap: 12px; flex-wrap: wrap; }
+    .mode-badge { background: rgba(79,142,247,0.12); border: 1px solid rgba(79,142,247,0.3); border-radius: 999px; padding: 5px 14px; font-size: 0.72rem; font-weight: 700; color: var(--accent2); letter-spacing: 0.08em; text-transform: uppercase; }
+    .q-counter { font-size: 0.85rem; color: var(--muted); font-weight: 600; }
+    .q-counter span { color: var(--text); font-weight: 700; }
+    .progress-bar-wrap { width: 100%; height: 5px; background: var(--border); border-radius: 999px; margin-bottom: 24px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: linear-gradient(90deg,#4f8ef7,#7ab3ff); border-radius: 999px; transition: width 0.4s cubic-bezier(0.4,0,0.2,1); }
+    .segment-progress { display: flex; gap: 3px; margin-bottom: 20px; flex-wrap: wrap; }
+    .seg-dot { flex: 1; min-width: 3px; max-width: 10px; height: 5px; border-radius: 999px; background: var(--border); transition: background 0.3s; }
+    .seg-dot.correct { background: var(--green); }
+    .seg-dot.wrong { background: var(--red); }
+    .seg-dot.current { background: var(--accent); }
+    .quiz-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px; align-items: start; }
+    .quiz-layout.no-passage { grid-template-columns: 1fr; }
+    .passage-panel { background: var(--surface2); border: 1px solid var(--border); border-radius: 18px; padding: 20px; max-height: 520px; overflow-y: auto; font-size: 0.87rem; line-height: 1.75; color: #cbd5e1; position: sticky; top: 16px; }
+    .passage-panel::-webkit-scrollbar { width: 5px; }
+    .passage-panel::-webkit-scrollbar-track { background: transparent; }
+    .passage-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+    .passage-panel h4 { font-size: 0.75rem; font-weight: 700; color: var(--accent2); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .passage-panel h4::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .passage-panel img { max-width: 100%; border-radius: 8px; margin: 8px 0; }
+    .question-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 26px; animation: slideIn 0.3s cubic-bezier(0.4,0,0.2,1); }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .q-label { font-size: 0.7rem; font-weight: 700; color: var(--accent2); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+    .q-text { font-size: 1rem; font-weight: 600; line-height: 1.65; margin-bottom: 18px; }
+    .q-img { max-width: 100%; border-radius: 10px; margin-bottom: 14px; display: block; }
+    .options { display: flex; flex-direction: column; gap: 9px; }
+    .option-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 13px 16px; text-align: left; cursor: pointer; transition: all 0.18s; font-size: 0.9rem; font-family: 'DM Sans',sans-serif; color: var(--text); font-weight: 500; line-height: 1.5; display: flex; align-items: flex-start; gap: 11px; }
+    .option-btn:hover:not(:disabled) { border-color: rgba(79,142,247,0.5); background: rgba(79,142,247,0.08); transform: translateX(3px); }
+    .option-btn .opt-label { width: 24px; height: 24px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.73rem; font-weight: 700; flex-shrink: 0; margin-top: 1px; transition: all 0.18s; }
+    .option-btn:hover:not(:disabled) .opt-label { background: var(--accent); color: #0a0e17; }
+    .option-btn.correct { border-color: var(--green); background: rgba(63,185,80,0.1); pointer-events: none; }
+    .option-btn.correct .opt-label { background: var(--green); color: #0a0e17; }
+    .option-btn.wrong { border-color: var(--red); background: rgba(248,81,73,0.1); pointer-events: none; }
+    .option-btn.wrong .opt-label { background: var(--red); color: #fff; }
+    .option-btn.disabled-plain { opacity: 0.5; pointer-events: none; }
+    .option-img { max-width: 100%; max-height: 120px; border-radius: 8px; display: block; margin-top: 6px; }
+    .feedback-box { border-radius: var(--radius); padding: 13px 17px; font-size: 0.87rem; font-weight: 600; margin-bottom: 14px; display: none; align-items: flex-start; gap: 10px; line-height: 1.5; }
+    .feedback-box.show { display: flex; }
+    .feedback-box.correct-fb { background: rgba(63,185,80,0.1); border: 1px solid rgba(63,185,80,0.3); color: #7ee787; }
+    .feedback-box.wrong-fb { background: rgba(248,81,73,0.1); border: 1px solid rgba(248,81,73,0.3); color: #ff7b72; }
+    .feedback-explanation { margin-top: 6px; font-size: 0.82rem; font-weight: 400; opacity: 0.9; line-height: 1.6; }
+    .btn-next { background: linear-gradient(135deg,#4f8ef7,#7ab3ff); color: #0a0e17; border: none; border-radius: var(--radius); padding: 14px 36px; font-size: 0.95rem; font-weight: 700; font-family: 'DM Sans',sans-serif; cursor: pointer; transition: all 0.2s; display: none; width: 100%; }
+    .btn-next.show { display: block; }
+    .btn-next:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(79,142,247,0.35); }
+    #result-screen { text-align: center; padding-top: 40px; }
+    .result-ring-wrap { display: flex; justify-content: center; margin-bottom: 26px; }
+    .result-ring { width: 160px; height: 160px; position: relative; }
+    .result-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .ring-bg { fill: none; stroke: var(--border); stroke-width: 10; }
+    .ring-fill { fill: none; stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1); }
+    .ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .ring-pct { font-family: 'Libre Baskerville', serif; font-size: 2.2rem; font-weight: 900; }
+    .ring-lbl { font-size: 0.7rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; }
+    .result-title { font-family: 'Libre Baskerville', serif; font-size: 2rem; font-weight: 900; margin-bottom: 8px; }
+    .result-sub { color: var(--muted); margin-bottom: 30px; }
+    .result-stats { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 32px; }
+    .res-stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 13px 18px; min-width: 95px; }
+    .res-stat .rs-num { font-family: 'Libre Baskerville', serif; font-size: 1.8rem; font-weight: 700; }
+    .res-stat .rs-lbl { font-size: 0.7rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+    .res-stat.green .rs-num { color: var(--green); }
+    .res-stat.red .rs-num { color: var(--red); }
+    .res-stat.blue .rs-num { color: var(--accent); }
+    .result-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-restart, .btn-back { border-radius: var(--radius); padding: 13px 26px; font-size: 0.9rem; font-weight: 700; cursor: pointer; font-family: 'DM Sans',sans-serif; transition: all 0.2s; border: none; }
+    .btn-restart { background: linear-gradient(135deg,#4f8ef7,#7ab3ff); color: #0a0e17; }
+    .btn-restart:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(79,142,247,0.35); }
+    .btn-back { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-back:hover { border-color: var(--accent); color: var(--accent2); }
+    .review-section { margin-top: 36px; text-align: left; }
+    .review-title { font-family: 'Libre Baskerville', serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 14px; color: var(--accent2); }
+    .review-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px; margin-bottom: 10px; }
+    .review-item .ri-q { font-size: 0.87rem; font-weight: 600; margin-bottom: 8px; line-height: 1.5; }
+    .review-item .ri-row { font-size: 0.8rem; margin-top: 4px; line-height: 1.5; }
+    .ri-wrong-ans { color: var(--red); }
+    .ri-right-ans { color: var(--green); }
+    @media (max-width: 700px) {
+      .quiz-layout { display: flex; flex-direction: column; gap: 10px; }
+      .passage-panel { position: static; max-height: 260px; overflow-y: auto; padding: 14px 16px; }
+      .question-card { padding: 18px 14px; }
+      .q-text { font-size: 0.93rem; }
+      .option-btn { font-size: 0.85rem; padding: 11px 13px; }
+      .screen { padding: 16px 12px 60px; }
+    }
+  </style>
+</head>
+<body>
+<div class="glow" id="glow"></div>
+
+<!-- START SCREEN -->
+<div class="screen active" id="start-screen">
+  <div class="logo-badge">⚗️ Hóa Học 10 – THPT</div>
+  <h1 class="main-title">Quiz Hóa Học 10</h1>
+  <p class="subtitle">Oxi hóa – Khử · Tốc độ Phản ứng · 30 câu trắc nghiệm</p>
+  <div class="stats-row">
+    <div class="stat-card"><div class="num">144</div><div class="lbl">Câu hỏi</div></div>
+    <div class="stat-card"><div class="num">4</div><div class="lbl">Đáp án/câu</div></div>
+    <div class="stat-card"><div class="num">∞</div><div class="lbl">Thời gian</div></div>
+  </div>
+  <button class="btn-start" id="btn-start">🚀 Bắt đầu làm bài</button>
+</div>
+
+<!-- QUIZ SCREEN -->
+<div class="screen" id="quiz-screen">
+  <div class="quiz-header">
+    <div class="mode-badge" id="cur-mode-badge">Trắc nghiệm</div>
+    <div class="q-counter">Câu <span id="q-cur">1</span> / <span id="q-total">30</span></div>
+  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-bar" style="width:0%"></div></div>
+  <div class="segment-progress" id="seg-progress"></div>
+  <div class="quiz-layout no-passage" id="quiz-layout">
+    <div class="passage-panel" id="passage-panel" style="display:none">
+      <div id="passage-text"></div>
+    </div>
+    <div class="question-card">
+      <div class="q-label" id="q-label">Câu 1</div>
+      <div class="q-text" id="q-text"></div>
+      <div id="q-content"></div>
+      <div class="feedback-box" id="feedback-box"></div>
+      <button class="btn-next" id="btn-next">Câu tiếp theo →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div class="screen" id="result-screen">
+  <div class="result-ring-wrap">
+    <div class="result-ring">
+      <svg viewBox="0 0 150 150">
+        <circle class="ring-bg" cx="75" cy="75" r="65"/>
+        <circle class="ring-fill" id="ring-fill" cx="75" cy="75" r="65"/>
+      </svg>
+      <div class="ring-center">
+        <div class="ring-pct" id="ring-pct">0%</div>
+        <div class="ring-lbl">Điểm</div>
+      </div>
+    </div>
+  </div>
+  <div class="result-title" id="result-title">Hoàn thành!</div>
+  <div class="result-sub" id="result-sub"></div>
+  <div class="result-stats">
+    <div class="res-stat green"><div class="rs-num" id="rs-correct">0</div><div class="rs-lbl">Đúng</div></div>
+    <div class="res-stat red"><div class="rs-num" id="rs-wrong">0</div><div class="rs-lbl">Sai</div></div>
+    <div class="res-stat blue"><div class="rs-num" id="rs-total">0</div><div class="rs-lbl">Tổng</div></div>
+  </div>
+  <div class="result-btns">
+    <button class="btn-restart" onclick="startQuiz()">🔄 Làm lại</button>
+    <button class="btn-back" onclick="showScreen('start-screen')">← Trang chủ</button>
+  </div>
+  <div class="review-section">
+    <div class="review-title">📋 Xem lại câu sai</div>
+    <div id="review-list"></div>
+  </div>
+</div>
+
+<script>
+const LABELS = ['A','B','C','D'];
+let questions = [];
+let qIdx = 0;
+let answers = [];
+
+const questionsData = [
+  {
+    id:'q1', label:'Câu 1',
+    question:'Số oxi hóa là một số đại số đặc trưng cho đại lượng nào sau đây của nguyên tử trong phân tử?',
+    options:['Hóa trị.','Điện tích.','Khối lượng.','Số hiệu nguyên tử.'],
+    correct:1,
+    explanation:'Số oxi hóa đặc trưng cho điện tích của nguyên tử trong phân tử (điện tích quy ước nếu liên kết là ion hoàn toàn).'
+  },
+  {
+    id:'q2', label:'Câu 2',
+    question:'Phản ứng oxi hóa – khử là phản ứng có sự nhường và nhận',
+    options:['Electron.','Neutron.','Proton.','Cation.'],
+    correct:0,
+    explanation:'Phản ứng oxi hóa – khử đặc trưng bởi sự chuyển dịch electron giữa các chất.'
+  },
+  {
+    id:'q3', label:'Câu 3',
+    question:'Dấu hiệu để nhận ra một phản ứng oxi hóa – khử là dựa trên sự thay đổi đại lượng nào sau đây của nguyên tử?',
+    options:['Số khối.','Số oxi hóa.','Số hiệu nguyên tử.','Số mol.'],
+    correct:1,
+    explanation:'Khi số oxi hóa của nguyên tử thay đổi thì đó là phản ứng oxi hóa – khử.'
+  },
+  {
+    id:'q4', label:'Câu 4',
+    question:'Trong phản ứng oxi hóa – khử, chất oxi hóa là chất',
+    options:['nhường electron.','nhận electron.','nhận proton.','nhường proton.'],
+    correct:1,
+    explanation:'Chất oxi hóa là chất nhận electron (bị khử), còn chất khử là chất nhường electron (bị oxi hóa).'
+  },
+  {
+    id:'q5', label:'Câu 5',
+    question:'Trong phản ứng oxi hóa – khử, chất nhường electron được gọi là',
+    options:['chất khử.','chất oxi hóa.','acid.','base.'],
+    correct:0,
+    explanation:'Chất khử là chất nhường electron (bị oxi hóa – số oxi hóa tăng).'
+  },
+  {
+    id:'q6', label:'Câu 6',
+    question:'Fe₂O₃ là thành phần chính của quặng hematite đỏ, dùng để luyện gang. Số oxi hóa của iron (sắt) trong Fe₂O₃ là',
+    options:['+3.','3+.','3.','-3.'],
+    correct:0,
+    explanation:'Trong Fe₂O₃: 2x + 3(−2) = 0 → x = +3. Số oxi hóa viết theo quy ước dấu trước số: +3.'
+  },
+  {
+    id:'q7', label:'Câu 7',
+    question:'Ammonia (NH₃) là nguyên liệu để sản xuất nitric acid và nhiều loại phân bón. Số oxi hóa của nitrogen trong ammonia là',
+    options:['3.','0.','+3.','-3.'],
+    correct:3,
+    explanation:'Trong NH₃: x + 3(+1) = 0 → x = −3. Nitrogen có số oxi hóa −3.'
+  },
+  {
+    id:'q8', label:'Câu 8',
+    question:'Chromium có số oxi hóa +2 trong hợp chất nào sau đây?',
+    options:['Cr(OH)₃.','Na₂CrO₄.','CrCl₂.','Cr₂O₃.'],
+    correct:2,
+    explanation:'CrCl₂: x + 2(−1) = 0 → x = +2. Các chất còn lại: Cr(OH)₃ có Cr(+3), Na₂CrO₄ có Cr(+6), Cr₂O₃ có Cr(+3).'
+  },
+  {
+    id:'q9', label:'Câu 9',
+    question:'Dẫn khí H₂ đi qua ống sứ đựng bột CuO nung nóng: $CuO + H_2 \\xrightarrow{t^0} Cu + H_2O$. Trong phản ứng trên, chất đóng vai trò chất khử là',
+    options:['CuO.','Cu.','H₂.','H₂O.'],
+    correct:2,
+    explanation:'H₂ nhường electron (H: 0 → +1), bị oxi hóa nên là chất khử. CuO là chất oxi hóa (Cu: +2 → 0).'
+  },
+  {
+    id:'q10', label:'Câu 10',
+    question:'Thuốc tím chứa ion permanganate ($MnO_4^-$) có tính oxi hóa mạnh. Số oxi hóa của manganese trong ion permanganate là',
+    options:['+2.','+3.','+7.','+6.'],
+    correct:2,
+    explanation:'Trong MnO₄⁻: x + 4(−2) = −1 → x = +7.'
+  },
+  {
+    id:'q11', label:'Câu 11',
+    question:'Trong phân tử NH₄NO₃ thì số oxi hóa của 2 nguyên tử N là',
+    options:['+1 và +1.','–4 và +6.','–3 và +5.','–3 và +6.'],
+    correct:2,
+    explanation:'NH₄⁺: N có số oxi hóa −3 (x + 4 = +1). NO₃⁻: N có số oxi hóa +5 (x − 6 = −1). Vậy là −3 và +5.'
+  },
+  {
+    id:'q12', label:'Câu 12',
+    question:'Tổng hệ số của các chất trong phản ứng: Fe₃O₄ + HNO₃ → Fe(NO₃)₃ + NO + H₂O là',
+    options:['55.','20.','31.','50.'],
+    correct:2,
+    explanation:'Cân bằng: 3Fe₃O₄ + 28HNO₃ → 9Fe(NO₃)₃ + NO + 14H₂O. Tổng hệ số = 3+28+9+1+14 = 55. Đáp án đúng là 55.'
+  },
+  {
+    id:'q13', label:'Câu 13',
+    question:'Cho phản ứng: Zn + CuSO₄ → Cu + ZnSO₄. Khẳng định đúng là',
+    options:[
+      'Chất khử là Cu²⁺, chất oxi hóa là Zn.',
+      'Chất khử là Zn, chất oxi hóa là Cu²⁺.',
+      'Chất khử là Cu, chất oxi hóa là Zn²⁺.',
+      'Chất khử là Zn²⁺, chất oxi hóa là Cu.'
+    ],
+    correct:1,
+    explanation:'Zn (0 → +2): nhường e → chất khử. Cu²⁺ (+2 → 0): nhận e → chất oxi hóa.'
+  },
+  {
+    id:'q14', label:'Câu 14',
+    question:'Phản ứng nào dưới đây là phản ứng oxi hóa – khử?',
+    options:[
+      'CaCO₃ → CaO + CO₂↑.',
+      'SO₃ + H₂O → H₂SO₄.',
+      'H₂SO₄ + Ba(OH)₂ → BaSO₄↓ + 2H₂O.',
+      'Mg + 2HCl → MgCl₂ + H₂↑.'
+    ],
+    correct:3,
+    explanation:'Mg + 2HCl → MgCl₂ + H₂: Mg (0 → +2) bị oxi hóa; H⁺ (+1 → 0) bị khử. Đây là phản ứng oxi hóa – khử.'
+  },
+  {
+    id:'q15', label:'Câu 15',
+    question:'Quá trình nào sau đây không xảy ra phản ứng oxi hóa – khử?',
+    options:[
+      'Đốt cháy cồn trong không khí.',
+      'Vật dụng kim loại bị han gỉ.',
+      'Hòa tan muối ăn vào nước.',
+      'Các vụ nổ pháo hoa.'
+    ],
+    correct:2,
+    explanation:'Hòa tan NaCl vào nước chỉ là quá trình vật lý (phân ly ion), không có sự thay đổi số oxi hóa.'
+  },
+  {
+    id:'q16', label:'Câu 16',
+    question:'Nước oxi già có tính oxi hóa mạnh, do khả năng oxi hóa của hydrogen peroxide (H₂O₂). Số oxi hóa của O trong H₂O₂ là',
+    options:['-1.','-2.','+1.','+2.'],
+    correct:0,
+    explanation:'Trong H₂O₂: 2(+1) + 2x = 0 → x = −1. Oxygen có số oxi hóa −1 (khác với −2 trong H₂O).'
+  },
+  {
+    id:'q17', label:'Câu 17',
+    question:'Khi động cơ đốt trong của xe máy, ôtô hoạt động, có sự đốt cháy nhiên liệu, sulfur, và N₂ trong không khí tạo CO₂, NO, NO₂ gây ô nhiễm. Vai trò của oxygen trong các phản ứng trên là',
+    options:['Chất môi trường.','Chất khử.','Chất oxi hóa.','Chất khí.'],
+    correct:2,
+    explanation:'Oxygen nhận electron trong phản ứng đốt cháy, đóng vai trò chất oxi hóa.'
+  },
+  {
+    id:'q18', label:'Câu 18',
+    question:'Máy đo nồng độ cồn hoạt động dựa trên phương trình: $3CH_3CH_2OH + Cr_2O_7^{2-} + 8H^+ \\to 3CH_3CHO + 2Cr^{3+} + 7H_2O$. Quá trình khử trong phản ứng trên là?',
+    options:[
+      '$\\overset{+6}{Cr} + 3e \\to \\overset{+3}{Cr}$.',
+      '$\\overset{-1}{Cr} \\to \\overset{+1}{C} + 2e$.',
+      '$\\overset{+7}{Cr} + 4e \\to \\overset{+3}{Cr}$.',
+      '$\\overset{-1}{Cr} \\to \\overset{+4}{C} + 5e$.'
+    ],
+    correct:0,
+    explanation:'Cr trong Cr₂O₇²⁻ có số oxi hóa +6, sau phản ứng tạo Cr³⁺ (+3). Nhận 3e → đây là quá trình khử.'
+  },
+  {
+    id:'q19', label:'Câu 19',
+    question:'Cho phản ứng: $aCu + bHNO_3 \\to cCu(NO_3)_2 + dNO + eH_2O$. Các hệ số a, b, c, d, e là nguyên, đơn giản nhất. Tổng (a + b) bằng:',
+    options:['8.','3.','11.','5.'],
+    correct:2,
+    explanation:'Cân bằng: 3Cu + 8HNO₃(loãng) → 3Cu(NO₃)₂ + 2NO + 4H₂O. a=3, b=8 → a+b = 11.'
+  },
+  {
+    id:'q20', label:'Câu 20',
+    question:'Hợp chất nào sau đây có số oxi hóa của S là –2?',
+    options:['FeSO₄.','Na₂S.','SO₂.','H₂SO₃.'],
+    correct:1,
+    explanation:'Na₂S: 2(+1) + x = 0 → x = −2. Các chất còn lại: FeSO₄ có S(+6), SO₂ có S(+4), H₂SO₃ có S(+4).'
+  },
+  {
+    id:'q21', label:'Câu 21',
+    question:'Số oxi hóa của nguyên tố Carbon trong đơn chất C là',
+    options:['+4.','0.','+2.','-2.'],
+    correct:1,
+    explanation:'Trong đơn chất, số oxi hóa của nguyên tố luôn bằng 0.'
+  },
+  {
+    id:'q22', label:'Câu 22',
+    question:'Trong phản ứng: Zn + CuCl₂ → ZnCl₂ + Cu thì 1 mol copper ion',
+    options:['nhận 1 mol e.','nhường 1 mol e.','nhận 2 mol e.','nhường 2 mol e.'],
+    correct:2,
+    explanation:'Cu²⁺ + 2e → Cu. Mỗi ion Cu²⁺ nhận 2 electron, nên 1 mol Cu²⁺ nhận 2 mol e.'
+  },
+  {
+    id:'q23', label:'Câu 23',
+    question:'Cho các chất sau: H₂S, H₂SO₄. Số oxi hoá của S tương ứng là',
+    options:['-2, +6','+2, +6','-2, +4','-2, +4'],
+    correct:0,
+    explanation:'H₂S: 2(+1)+x=0 → x=−2. H₂SO₄: 2(+1)+x+4(−2)=0 → x=+6. Kết quả: −2 và +6.'
+  },
+  {
+    id:'q24', label:'Câu 24',
+    question:'Carbon đóng vai trò chất oxi hóa ở phản ứng nào sau đây?',
+    options:[
+      '$C + O_2 \\xrightarrow{t^0} CO_2$',
+      '$C + CO_2 \\xrightarrow{t^0} 2CO$',
+      '$C + H_2O \\xrightarrow{t^0} CO + H_2$',
+      '$C + H_2 \\xrightarrow{t^0} CH_4$'
+    ],
+    correct:3,
+    explanation:'C + 2H₂ → CH₄: C (0 → −4) nhận electron → là chất oxi hóa. H₂ (0 → +1) nhường electron → là chất khử.'
+  },
+  {
+    id:'q25', label:'Câu 25',
+    question:'Trong phản ứng: MnO₂ + 2HCl → MnCl₂ + Cl₂ + 2H₂O. Quá trình nào sau đây đúng?',
+    options:[
+      'Mn²⁺ + 2e → Mn⁴⁺',
+      'Mn⁴⁺ + 2e → Mn²⁺',
+      'Cl⁻ + 1e → Cl₂',
+      '2Cl⁻ + 2e → Cl₂'
+    ],
+    correct:1,
+    explanation:'MnO₂: Mn có số oxi hóa +4, sau phản ứng tạo MnCl₂: Mn có số oxi hóa +2. Mn⁴⁺ + 2e → Mn²⁺ là quá trình khử đúng.'
+  },
+  {
+    id:'q26', label:'Câu 26',
+    question:'Hợp chất nào sau đây có số oxi hóa của N là +5?',
+    options:['HNO₂.','N₂.','NO.','HNO₃.'],
+    correct:3,
+    explanation:'HNO₃: (+1) + x + 3(−2) = 0 → x = +5. HNO₂ có N(+3), N₂ có N(0), NO có N(+2).'
+  },
+  {
+    id:'q27', label:'Câu 27',
+    question:'Hợp chất mà nguyên tố Cl có số oxi hoá +3 là:',
+    options:['NaClO','NaClO₂','NaClO₃','NaClO₄'],
+    correct:1,
+    explanation:'NaClO₂: (+1) + x + 2(−2) = 0 → x = +3. NaClO: Cl(+1), NaClO₃: Cl(+5), NaClO₄: Cl(+7).'
+  },
+  {
+    id:'q28', label:'Câu 28',
+    question:'Chọn phản ứng không thuộc loại phản ứng oxi hóa – khử.',
+    options:[
+      '$2Fe + 3Cl_2 \\xrightarrow{t°} 2FeCl_3$.',
+      '$Fe_3O_4 + 4CO \\xrightarrow{t°} 3Fe + 4CO_2$.',
+      '$2Fe(OH)_3 \\xrightarrow{t°} Fe_2O_3 + 3H_2O$.',
+      '$2H_2 + O_2 \\xrightarrow{t°} 2H_2O$.'
+    ],
+    correct:2,
+    explanation:'2Fe(OH)₃ → Fe₂O₃ + 3H₂O là phản ứng phân hủy, không có sự thay đổi số oxi hóa nào → không phải phản ứng oxi hóa – khử.'
+  },
+  {
+    id:'q29', label:'Câu 29',
+    question:'Phản ứng oxi hóa – khử là phản ứng có sự nhường và nhận',
+    options:['electron.','neutron.','proton.','cation.'],
+    correct:0,
+    explanation:'Định nghĩa: phản ứng oxi hóa – khử là phản ứng có sự chuyển electron giữa các chất phản ứng.'
+  },
+  {
+    id:'q30', label:'Câu 30',
+    question:'Phản ứng nào sau đây là phản ứng oxi hóa – khử?',
+    options:[
+      '$2Ca + O_2 \\xrightarrow{t^0} 2CaO$.',
+      '$CaCO_3 \\xrightarrow{t^0} CaO + CO_2$.',
+      '$CaO + H_2O \\to Ca(OH)_2$.',
+      '$Ca(OH)_2 + CO_2 \\to CaCO_3 + H_2O$.'
+    ],
+    correct:0,
+    explanation:'2Ca + O₂ → 2CaO: Ca (0 → +2) bị oxi hóa; O₂ (0 → −2) bị khử. Đây là phản ứng oxi hóa – khử.'
+  },
+  {
+    id: 'q31', label: 'Câu 31',
+    question: 'Cho các chất sau: $Cl_2, HCl, NaCl, KClO_3, HClO_4$. Số oxi hóa của nguyên tử $Cl$ trong phân tử các chất trên lần lượt là?',
+    options: [
+      '$0; +1; +1; +5; +7$.',
+      '$0; -1; -1; +5; +7$.',
+      '$1; -1; -1; -5; -7$.',
+      '$0; 1; 1; 5; 7$.'
+    ],
+    correct: 1,
+    explanation: '$Cl_2$: $Cl(0)$; $HCl$: $Cl(-1)$; $NaCl$: $Cl(-1)$; $KClO_3$: $Cl(+5)$; $HClO_4$: $Cl(+7)$.'
+  },
+  {
+    id: 'q32', label: 'Câu 32',
+    question: 'Thế nào là phản ứng thu nhiệt?',
+    options: [
+      'Là phản ứng giải phóng năng lượng dạng nhiệt.',
+      'Là phản ứng hấp thụ năng lượng dạng nhiệt.',
+      'Là phản ứng hấp thụ ion dưới dạng nhiệt.',
+      'Là phản ứng giải phóng ion dưới dạng nhiệt.'
+    ],
+    correct: 1,
+    explanation: 'Phản ứng thu nhiệt là phản ứng hấp thụ năng lượng dưới dạng nhiệt từ môi trường xung quanh.'
+  },
+  {
+    id: 'q33', label: 'Câu 33',
+    question: 'Quy ước về dấu của nhiệt phản ứng ($\Delta_r H_{298}^o$) nào sau đây là đúng?',
+    options: [
+      'Phản ứng thu nhiệt có $\Delta_r H_{298}^o < 0$.',
+      'Phản ứng thu nhiệt có $\Delta_r H_{298}^o > 0$.',
+      'Phản ứng tỏa nhiệt có $\Delta_r H_{298}^o > 0$.',
+      'Phản ứng thu nhiệt có $\Delta_r H_{298}^o = 0$.'
+    ],
+    correct: 1,
+    explanation: 'Quy ước: Phản ứng tỏa nhiệt có $\Delta_r H < 0$; Phản ứng thu nhiệt có $\Delta_r H > 0$.'
+  },
+  {
+    id: 'q34', label: 'Câu 34',
+    question: 'Điều kiện chuẩn đối với chất khí là?',
+    options: [
+      'Áp suất 1 bar và nhiệt độ $25^\circ C$ hay $298K$.',
+      'Áp suất 1 bar và nhiệt độ $298K$ hay $25K$.',
+      'Áp suất 1 atm và nhiệt độ $25^\circ C$.',
+      'Áp suất 1 bar và nhiệt độ $25K$.'
+    ],
+    correct: 0,
+    explanation: 'Điều kiện chuẩn được quy định ở áp suất 1 bar và nhiệt độ thường (thường chọn $25^\circ C$ hay $298K$).'
+  },
+  {
+    id: 'q35', label: 'Câu 35',
+    question: 'Kí hiệu enthalpy tạo thành (nhiệt tạo thành) của phản ứng ở điều kiện chuẩn là?',
+    options: [
+      '$\Delta_r H_{298}^o$',
+      '$\Delta_f H_{298}^o$',
+      '$\Delta_r S_{298}^o$',
+      '$\Delta_f H$'
+    ],
+    correct: 1,
+    explanation: 'Kí hiệu $\Delta_f H_{298}^o$ dùng để chỉ biến thiên enthalpy tạo thành chuẩn (f là viết tắt của formation).'
+  },
+  {
+    id: 'q36', label: 'Câu 36',
+    question: 'Kí hiệu biến thiên enthalpy (nhiệt phản ứng) của phản ứng ở điều kiện chuẩn là?',
+    options: [
+      '$\Delta_r H_{298}^o$',
+      '$\Delta_f H_{298}^o$',
+      '$\Delta_r H$',
+      '$\Delta_r G_{298}^o$'
+    ],
+    correct: 0,
+    explanation: 'Kí hiệu $\Delta_r H_{298}^o$ dùng để chỉ biến thiên enthalpy phản ứng chuẩn (r là viết tắt của reaction).'
+  },
+  {
+    id: 'q37', label: 'Câu 37',
+    question: 'Phản ứng tỏa nhiệt là gì?',
+    options: [
+      'Là phản ứng giải phóng năng lượng dưới dạng nhiệt.',
+      'Là phản ứng hấp thụ năng lượng dưới dạng nhiệt.',
+      'Là phản ứng giải phóng ion dưới dạng nhiệt.',
+      'Là phản ứng hấp thụ ion dưới dạng nhiệt.'
+    ],
+    correct: 0,
+    explanation: 'Phản ứng tỏa nhiệt là phản ứng giải phóng năng lượng dưới dạng nhiệt ra môi trường.'
+  },
+  {
+    id: 'q38', label: 'Câu 38',
+    question: 'Công thức tính biến thiên enthalpy chuẩn của phản ứng dựa vào nhiệt tạo thành nào sau đây đúng?',
+    options: [
+      '$\Delta_r H_{298}^o = \sum \Delta_f H_{298}^o(sp) - \sum \Delta_f H_{298}^o(cđ)$',
+      '$\Delta_r H_{298}^o = \sum \Delta_f H_{298}^o(cđ) - \sum \Delta_f H_{298}^o(sp)$',
+      '$\Delta_r H_{298}^o = \sum E_b(sp) - \sum E_b(cđ)$',
+      '$\Delta_r H_{298}^o = \sum E_b(cđ) - \sum E_b(sp)$'
+    ],
+    correct: 0,
+    explanation: 'Biến thiên enthalpy chuẩn của phản ứng bằng tổng nhiệt tạo thành của sản phẩm trừ tổng nhiệt tạo thành của chất đầu.'
+  },
+  {
+    id: 'q39', label: 'Câu 39',
+    question: 'Phản ứng nào sau đây là phản ứng thu nhiệt?',
+    options: [
+      'Phản ứng tôi vôi.',
+      'Phản ứng đốt than và củi.',
+      'Phản ứng phân hủy đá vôi.',
+      'Phản ứng đốt nhiên liệu.'
+    ],
+    correct: 2,
+    explanation: 'Phản ứng phân hủy đá vôi ($CaCO_3$) cần cung cấp nhiệt liên tục nên là phản ứng thu nhiệt.'
+  },
+  {
+    id: 'q40', label: 'Câu 40',
+    question: 'Xác định biến thiên enthalpy của phản ứng sau ở điều kiện chuẩn: $CaCO_3 \rightarrow CaO + CO_2$. Biết $\Delta_f H_{298}^o$ của $CaCO_3(s)$ là $-1206,9 kJ/mol$, của $CaO(s)$ là $-635,1 kJ/mol$, của $CO_2(g)$ là $-393,5 kJ/mol$.',
+    options: [
+      '$-178,3 kJ$.',
+      '$-1028,6 kJ$.',
+      '$+178,3 kJ$.',
+      '$-1206 kJ$.'
+    ],
+    correct: 2,
+    explanation: '$\Delta_r H = (-635,1 - 393,5) - (-1206,9) = +178,3 kJ$.'
+  },
+  {
+    id: 'q41', label: 'Câu 41',
+    question: 'Cho phản ứng: $SO_2(g) + \frac{1}{2}O_2(g) \rightarrow SO_3(l)$ có $\Delta_r H_{298}^o = -144,2 kJ$. Biết $\Delta_f H_{298}^o(SO_3(l)) = -441,0 kJ/mol$. Nhiệt tạo thành chuẩn của $SO_2$ là?',
+    options: [
+      '$-441,0 kJ/mol$.',
+      '$-144,2 kJ/mol$.',
+      '$-296,8 kJ/mol$.',
+      '$0 kJ/mol$.'
+    ],
+    correct: 2,
+    explanation: '$\Delta_r H = \Delta_f H(SO_3) - \Delta_f H(SO_2) \Rightarrow -144,2 = -441,0 - \Delta_f H(SO_2) \Rightarrow \Delta_f H(SO_2) = -296,8 kJ/mol$.'
+  },
+  {
+    id: 'q42', label: 'Câu 42',
+    question: 'Tính biến thiên enthalpy chuẩn của phản ứng: $C_4H_{10}(g) \rightarrow C_2H_4(g) + C_2H_6(g)$. Biết $E_b(C-H) = 418, E_b(C-C) = 346, E_b(C=C) = 612 (kJ/mol)$.',
+    options: [
+      '$-80 kJ$.',
+      '$-734 kJ$.',
+      '$-915 kJ$.',
+      '$+80 kJ$.'
+    ],
+    correct: 3,
+    explanation: '$\Delta_r H = \sum E_{b(cđ)} - \sum E_{b(sp)}$. Tổng năng lượng liên kết bị phá vỡ (trong $C_4H_{10}$) và hình thành lại ($C_2H_4, C_2H_6$) cho kết quả $+80 kJ$.'
+  },
+  {
+    id: 'q43', label: 'Câu 43',
+    question: 'Cho phản ứng: $2H_2(g) + O_2(g) \rightarrow 2H_2O(l)$ có $\Delta_r H_{298}^o = -571,68 kJ$. Chọn phát biểu đúng?',
+    options: [
+      'Phản ứng tỏa nhiệt và tự diễn ra.',
+      'Phản ứng thu nhiệt, không tự diễn ra.',
+      'Phản ứng diễn ra ở nhiệt độ thấp.',
+      'Phản ứng tỏa nhiệt, không tự diễn ra.'
+    ],
+    correct: 0,
+    explanation: 'Vì $\Delta_r H < 0$ nên đây là phản ứng tỏa nhiệt, các phản ứng tỏa nhiệt mạnh thường dễ dàng tự xảy ra.'
+  },
+  {
+    id: 'q44', label: 'Câu 44',
+    question: 'Cho phản ứng: $N_2(g) + O_2(g) \rightarrow 2NO(g)$ có $\Delta_r H_{298}^o = +89,6 kJ/mol$. Chọn phát biểu đúng?',
+    options: [
+      'Phản ứng thu nhiệt từ môi trường.',
+      'Phản ứng tỏa nhiệt ra môi trường.',
+      'Phản ứng tự xảy ra.',
+      'Nhiệt độ môi trường xung quanh hệ tăng lên.'
+    ],
+    correct: 0,
+    explanation: '$\Delta_r H > 0$ chứng tỏ hệ nhận nhiệt từ môi trường, đây là phản ứng thu nhiệt.'
+  },
+  {
+    id: 'q45', label: 'Câu 45',
+    question: 'Cho phản ứng: $2H_2(g) + I_2(g) \rightarrow 2HI(g)$, $\Delta_r H_{298}^o = +113 kJ$. Chọn phát biểu đúng?',
+    options: [
+      'Phản ứng giải phóng nhiệt lượng là $113 kJ$ khi có $2 mol HI$ được tạo thành.',
+      'Phản ứng hấp thụ nhiệt lượng là $113 kJ$ khi có $1 mol HI$ được tạo thành.',
+      'Nhiệt tạo thành chuẩn của $HI$ là $+56,5 kJ/mol$.',
+      'Nhiệt tạo thành chuẩn của $HI$ là $+113 kJ/mol$.'
+    ],
+    correct: 2,
+    explanation: 'Nhiệt tạo thành chuẩn tính cho $1 mol$ chất. $\Delta_f H(HI) = 113 / 2 = +56,5 kJ/mol$.'
+  },
+  {
+    id: 'q46', label: 'Câu 46',
+    question: 'Cho phản ứng: $C(s) + H_2O(g) \rightleftharpoons CO(g) + H_2(g)$, $\Delta_r H_{298}^{0} = 131,25$ kJ. Phản ứng trên là phản ứng',
+    options: [
+      'tỏa nhiệt.',
+      'thu nhiệt.',
+      'không có sự thay đổi năng lượng.',
+      'oxi hóa - khử.'
+    ],
+    correct: 1,
+    explanation: 'Vì $\Delta_r H_{298}^{0} > 0$ (131,25 kJ) nên đây là phản ứng thu nhiệt[cite: 1].'
+  },
+  {
+    id: 'q47', label: 'Câu 47',
+    question: 'Dựa vào phương trình nhiệt hóa học của phản ứng sau: $3H_2(g) + N_2(g) \rightarrow 2NH_3(g)$, $\Delta_r H_{298}^{0} = -91,80$ kJ. Giá trị $\Delta_r H_{298}^{0}$ của phản ứng: $H_2(g) + \frac{1}{3}N_2(g) \rightarrow \frac{2}{3}NH_3(g)$ là',
+    options: [
+      '-30,60 kJ.',
+      '-91,80 kJ.',
+      '30,60 kJ.',
+      '91,80 kJ.'
+    ],
+    correct: 0,
+    explanation: 'Hệ số của các chất trong phản ứng sau bằng 1/3 phản ứng trước, nên nhiệt phản ứng cũng bằng 1/3: $-91,80 / 3 = -30,60$ kJ[cite: 1].'
+  },
+  {
+    id: 'q48', label: 'Câu 48',
+    question: 'Phương trình nhiệt hóa học giữa nitrogen và oxygen như sau: $N_2(g) + O_2(g) \rightarrow 2NO(g)$, $\Delta_r H_{298}^{0} = +180$ kJ. Kết luận nào sau đây đúng?',
+    options: [
+      'Nitrogen và oxygen phản ứng mạnh hơn khi ở nhiệt độ thấp.',
+      'Phản ứng tỏa nhiệt.',
+      'Phản ứng thu nhiệt.',
+      'Phản ứng diễn ra thuận lợi ở điều kiện thường.'
+    ],
+    correct: 2,
+    explanation: '$\Delta_r H_{298}^{0} = +180$ kJ > 0 nên phản ứng thu nhiệt[cite: 1].'
+  },
+  {
+    id: 'q49', label: 'Câu 49',
+    question: 'Điều kiện nào sau đây là điều kiện chuẩn?',
+    options: [
+      'Áp suất 1 bar và nhiệt độ $25 ^\circ C$ (hay 298 K).',
+      'Áp suất 1 atm và nhiệt độ $0 ^\circ C$ (hay 273 K).',
+      'Áp suất 1 bar và nhiệt độ $0 ^\circ C$ (hay 273 K).',
+      'Áp suất 1 atm và nhiệt độ $25 ^\circ C$ (hay 298 K).'
+    ],
+    correct: 0,
+    explanation: 'Theo quy ước mới, điều kiện chuẩn là áp suất 1 bar và nhiệt độ 298 K[cite: 1].'
+  },
+  {
+    id: 'q50', label: 'Câu 50',
+    question: 'Nhiệt lượng tỏa ra hay thu vào của một phản ứng hóa học trong điều kiện áp suất không đổi gọi là',
+    options: [
+      'biến thiên enthalpy của phản ứng.',
+      'nhiệt dung của phản ứng.',
+      'năng lượng hoạt hóa của phản ứng.',
+      'tốc độ của phản ứng.'
+    ],
+    correct: 0,
+    explanation: 'Đây là định nghĩa của biến thiên enthalpy phản ứng[cite: 1].'
+  },
+  {
+    id: 'q51', label: 'Câu 51',
+    question: 'Tốc độ phản ứng hóa học là',
+    options: [
+      'Độ biến thiên nồng độ của một chất phản ứng trong một đơn vị thời gian.',
+      'Độ biến thiên nồng độ của một chất sản phẩm trong một đơn vị thời gian.',
+      'Độ biến thiên nồng độ của một chất phản ứng hoặc sản phẩm trong một đơn vị thời gian.',
+      'Độ biến thiên khối lượng của một chất phản ứng trong một đơn vị thời gian.'
+    ],
+    correct: 2,
+    explanation: 'Tốc độ phản ứng đo lường sự thay đổi nồng độ của bất kỳ chất nào trong phản ứng theo thời gian[cite: 1].'
+  },
+  {
+    id: 'q52', label: 'Câu 52',
+    question: 'Yếu tố nào sau đây không làm thay đổi tốc độ phản ứng?',
+    options: [
+      'Nồng độ các chất phản ứng.',
+      'Nhiệt độ.',
+      'Chất xúc tác.',
+      'Thể tích của bình chứa (đối với phản ứng không có chất khí).'
+    ],
+    correct: 3,
+    explanation: 'Nếu không có chất khí, việc thay đổi thể tích bình chứa không làm thay đổi nồng độ hay áp suất các chất nên không ảnh hưởng tốc độ[cite: 1].'
+  },
+  {
+    id: 'q53', label: 'Câu 53',
+    question: 'Khi tăng nồng độ chất phản ứng, tốc độ phản ứng tăng là do',
+    options: [
+      'Số va chạm giữa các phân tử chất phản ứng tăng lên.',
+      'Năng lượng của các phân tử chất phản ứng tăng lên.',
+      'Số va chạm hiệu quả giữa các phân tử chất phản ứng tăng lên.',
+      'Cả A và C đều đúng.'
+    ],
+    correct: 3,
+    explanation: 'Tăng nồng độ làm tăng tổng số va chạm và tỉ lệ thuận với số va chạm hiệu quả[cite: 1].'
+  },
+  {
+    id: 'q54', label: 'Câu 54',
+    question: 'Chất xúc tác là chất',
+    options: [
+      'làm tăng tốc độ phản ứng và bị biến đổi sau phản ứng.',
+      'làm tăng tốc độ phản ứng nhưng không bị biến đổi sau phản ứng.',
+      'làm giảm tốc độ phản ứng và không bị biến đổi sau phản ứng.',
+      'làm thay đổi tốc độ phản ứng và bị tiêu hao sau phản ứng.'
+    ],
+    correct: 1,
+    explanation: 'Chất xúc tác làm tăng tốc độ phản ứng bằng cách hạ thấp năng lượng hoạt hóa nhưng không bị tiêu hao hay biến đổi về chất[cite: 1].'
+  },
+  {
+    id: 'q55', label: 'Câu 55',
+    question: 'Cho phản ứng: $A + B \rightarrow C$. Tốc độ trung bình của phản ứng được tính theo công thức:',
+    options: [
+      '$v = \frac{\Delta C}{\Delta t}$',
+      '$v = -\frac{\Delta C}{\Delta t}$',
+      '$v = \frac{1}{\Delta C \cdot \Delta t}$',
+      '$v = \Delta C \cdot \Delta t$'
+    ],
+    correct: 0,
+    explanation: 'Tốc độ trung bình là thương số giữa biến thiên nồng độ (trị tuyệt đối) và biến thiên thời gian[cite: 1].'
+  },
+  {
+    id: 'q56', label: 'Câu 56',
+    question: 'Yếu tố diện tích bề mặt ảnh hưởng đến tốc độ phản ứng của',
+    options: [
+      'chất khí.',
+      'chất lỏng.',
+      'chất rắn.',
+      'dung dịch.'
+    ],
+    correct: 2,
+    explanation: 'Diện tích bề mặt chỉ có ý nghĩa đối với các phản ứng có sự tham gia của chất rắn[cite: 1].'
+  },
+  {
+    id: 'q57', label: 'Câu 57',
+    question: 'Khi tăng nhiệt độ lên $10 ^\circ C$, tốc độ phản ứng tăng 2 lần. Nếu tăng nhiệt độ từ $20 ^\circ C$ lên $50 ^\circ C$ thì tốc độ phản ứng tăng',
+    options: [
+      '4 lần.',
+      '6 lần.',
+      '8 lần.',
+      '12 lần.'
+    ],
+    correct: 2,
+    explanation: 'Áp dụng quy tắc Van\'t Hoff: $2^{(50-20)/10} = 2^3 = 8$ lần[cite: 1].'
+  },
+  {
+    id: 'q58', label: 'Câu 58',
+    question: 'Đối với phản ứng có chất khí tham gia, khi tăng áp suất, tốc độ phản ứng tăng là do',
+    options: [
+      'nồng độ các chất khí tăng.',
+      'nhiệt độ hệ phản ứng tăng.',
+      'năng lượng hoạt hóa giảm.',
+      'diện tích tiếp xúc tăng.'
+    ],
+    correct: 0,
+    explanation: 'Tăng áp suất bằng cách nén hệ khí sẽ làm tăng nồng độ các chất khí trong một đơn vị thể tích[cite: 1].'
+  },
+  {
+    id: 'q59', label: 'Câu 59',
+    question: 'Hằng số tốc độ phản ứng $k$ phụ thuộc vào',
+    options: [
+      'nồng độ chất phản ứng.',
+      'nhiệt độ và bản chất của các chất phản ứng.',
+      'áp suất của hệ.',
+      'thời gian xảy ra phản ứng.'
+    ],
+    correct: 1,
+    explanation: 'Hằng số tốc độ $k$ chỉ phụ thuộc vào nhiệt độ và bản chất hệ phản ứng, không phụ thuộc nồng độ[cite: 1].'
+  },
+  {
+    id: 'q60', label: 'Câu 60',
+    question: 'Định luật tác dụng khối lượng chỉ áp dụng cho các phản ứng',
+    options: [
+      'phức tạp.',
+      'đơn giản (phản ứng một bước).',
+      'thuận nghịch.',
+      'xảy ra ở nhiệt độ cao.'
+    ],
+    correct: 1,
+    explanation: 'Đối với các phản ứng đơn giản, tốc độ tỉ lệ thuận với tích nồng độ các chất tham gia với số mũ tương ứng hệ số trong phương trình[cite: 1].'
+  },
+  {
+    id: 'q61', label: 'Câu 61',
+    question: 'Khi đốt than trong lò, đậy nắp lò sẽ giữ than cháy được lâu hơn. Yếu tố ảnh hưởng đến tốc độ phản ứng được vận dụng là',
+    options: ['nhiệt độ.', 'nồng độ.', 'chất xúc tác.', 'diện tích bề mặt tiếp xúc.'],
+    correct: 1,
+    explanation: 'Đậy nắp lò làm hạn chế lượng oxygen (giảm nồng độ $O_2$), khiến tốc độ cháy chậm lại và giữ than cháy lâu hơn[cite: 1].'
+  },
+  {
+    id:'62_img', label:'Câu 62',
+    question:'Thực hiện 2 thí nghiệm theo hình vẽ sau:<br><img src="C62.png" alt="Thí nghiệm TN1 và TN2" class="q-img" onerror="this.style.display=\'none\'"><br>Ở thí nghiệm nào có kết tủa xuất hiện trước?',
+    options:[
+      'TN1 có kết tủa xuất hiện trước.',
+      'TN2 có kết tủa xuất hiện trước.',
+      'Kết tủa xuất hiện đồng thời.',
+      'Không có kết tủa xuất hiện.'
+    ],
+    correct:0,
+    explanation:'TN1 có nồng độ chất phản ứng cao hơn (hoặc diện tích tiếp xúc lớn hơn) nên tốc độ phản ứng nhanh hơn, kết tủa xuất hiện trước.'
+  },
+  {
+    id: 'q63', label: 'Câu 63',
+    question: 'So sánh tốc độ của 2 phản ứng: (1) Zn bột + $CuSO_4$ 1M; (2) Zn hạt + $CuSO_4$ 1M (cùng khối lượng Zn). Kết quả là',
+    options: [
+      '(1) nhanh hơn (2).',
+      '(2) nhanh hơn (1).',
+      'như nhau.',
+      'ban đầu như nhau, sau đó (2) nhanh hơn (1).'
+    ],
+    correct: 0,
+    explanation: 'Dạng bột có diện tích bề mặt tiếp xúc lớn hơn dạng hạt nên tốc độ phản ứng nhanh hơn[cite: 1].'
+  },
+  {
+    id: 'q64', label: 'Câu 64',
+    question: 'Cho phản ứng: $2NO + O_2 \\to 2NO_2$ có $v = k \\cdot C_{NO}^2 \\cdot C_{O_2}$. Nếu nồng độ NO tăng 2 lần, giữ nguyên $O_2$, thì tốc độ sẽ',
+    options: ['tăng 4 lần.', 'tăng 2 lần.', 'tăng 3 lần.', 'giữ nguyên.'],
+    correct: 0,
+    explanation: 'Nồng độ NO tăng 2 lần thì tốc độ tăng $2^2 = 4$ lần do NO có số mũ là 2 trong biểu thức tốc độ[cite: 1].'
+  },
+  {
+    id: 'q65', label: 'Câu 65',
+    question: 'Trong sản xuất $H_2SO_4$, phản ứng: $2SO_2 + O_2 \\xrightarrow{V_2O_5} 2SO_3$. Phát biểu nào sau đây KHÔNG đúng?',
+    options: [
+      'Khi tăng áp suất khí $SO_2$ hay $O_2$ thì tốc độ phản ứng đều tăng lên.',
+      'Tăng nồng độ $SO_2$ sẽ làm tăng tốc độ phản ứng.',
+      'Xúc tác sẽ dần chuyển hoá thành chất khác nhưng khối lượng không đổi.',
+      'Cần làm nóng bình phản ứng để đẩy nhanh tốc độ phản ứng.'
+    ],
+    correct: 2,
+    explanation: 'Chất xúc tác không bị biến đổi về chất và lượng sau phản ứng[cite: 1].'
+  },
+  {
+    id: 'q66', label: 'Câu 66',
+    question: 'Trong phản ứng thủy phân ethyl acetate với xúc tác HCl. Phát biểu nào sau đây đúng?',
+    options: [
+      'Nồng độ acid tăng dần theo thời gian.',
+      'Thời điểm ban đầu, nồng độ acid trong bình phản ứng bằng 0.',
+      'Tỉ lệ mol giữa chất đầu và chất sản phẩm luôn bằng 1.',
+      'HCl đóng vai trò xúc tác nên nồng độ không thay đổi đáng kể.'
+    ],
+    correct: 3,
+    explanation: 'HCl là chất xúc tác, nó không bị tiêu hao trong quá trình phản ứng[cite: 1].'
+  },
+  {
+    id: 'q67', label: 'Câu 67',
+    question: 'Cho phản ứng: $H_2O_2 \\to H_2O + \\frac{1}{2}O_2$. Tốc độ phản ứng tức thời biến đổi như thế nào theo thời gian?',
+    options: ['Giảm dần.', 'Tăng dần.', 'Giảm dần sau đó tăng nhanh.', 'Tăng nhanh sau đó giảm dần.'],
+    correct: 0,
+    explanation: 'Theo thời gian, nồng độ chất tham gia ($H_2O_2$) giảm dần nên tốc độ phản ứng cũng giảm dần[cite: 1].'
+  },
+  {
+    id:'q68_img', label:'Câu 68',
+    question:'Biểu đồ nào sau đây <b>không</b> biểu diễn sự phụ thuộc nồng độ chất tham gia với thời gian?',
+    options:[
+      '<img src="C68_A.png" alt="Đồ thị A" class="option-img" onerror="this.style.display=\'none\'"> Đồ thị A',
+      '<img src="C68_B.png" alt="Đồ thị B" class="option-img" onerror="this.style.display=\'none\'"> Đồ thị B',
+      '<img src="C68_C.png" alt="Đồ thị C" class="option-img" onerror="this.style.display=\'none\'"> Đồ thị C',
+      '<img src="C68_D.png" alt="Đồ thị D" class="option-img" onerror="this.style.display=\'none\'"> Đồ thị D'
+    ],
+    correct:2,
+    explanation:'Nồng độ chất tham gia phản ứng luôn giảm dần theo thời gian. Đồ thị C không thể hiện đúng xu hướng này nên là đáp án sai.'
+  },
+  {
+    id: 'q69', label: 'Câu 69',
+    question: 'Tốc độ của một phản ứng hoá học',
+    options: [
+      'chỉ phụ thuộc vào nồng độ các chất tham gia.',
+      'tăng khi nhiệt độ của phản ứng tăng.',
+      'càng nhanh khi giá trị năng lượng hoạt hoá càng lớn.',
+      'không phụ thuộc vào diện tích bề mặt.'
+    ],
+    correct: 1,
+    explanation: 'Khi nhiệt độ tăng, các phân tử chuyển động nhanh hơn, số va chạm hiệu quả tăng làm tốc độ phản ứng tăng[cite: 1].'
+  },
+  {
+    id: 'q70', label: 'Câu 70',
+    question: 'Yếu tố nào sau đây không ảnh hưởng đến tốc độ của phản ứng chỉ có chất rắn?',
+    options: ['Nhiệt độ.', 'Áp suất.', 'Diện tích tiếp xúc.', 'Chất xúc tác.'],
+    correct: 1,
+    explanation: 'Áp suất chỉ ảnh hưởng rõ rệt đến tốc độ phản ứng nếu có chất khí tham gia[cite: 1].'
+  },
+  {
+    id: 'q71', label: 'Câu 71',
+    question: 'Yếu tố nào sau đây không ảnh hưởng đến tốc độ phản ứng?',
+    options: [
+      'Nhiệt độ chất phản ứng.',
+      'Thể vật lí của chất phản ứng.',
+      'Nồng độ chất phản ứng.',
+      'Tỉ lệ mol của các chất trong phương trình hóa học.'
+    ],
+    correct: 3,
+    explanation: 'Hệ số tỉ lượng trong phương trình không trực tiếp quyết định tốc độ nếu không thay đổi các yếu tố nồng độ, nhiệt độ...[cite: 1]'
+  },
+  {
+    id: 'q72', label: 'Câu 72',
+    question: 'Việc rắc men vào tinh bột đã nấu chín để ủ rượu vận dụng yếu tố nào?',
+    options: ['Nhiệt độ.', 'Chất xúc tác.', 'Nồng độ.', 'Áp suất.'],
+    correct: 1,
+    explanation: 'Men rượu đóng vai trò là chất xúc tác sinh học (enzyme) để thúc đẩy quá trình lên men[cite: 1].'
+  },
+  {
+    id: 'q73', label: 'Câu 73',
+    question: 'Dùng không khí nén thổi vào lò cao để đốt cháy than cốc, yếu tố nào làm tăng tốc độ phản ứng?',
+    options: ['Nhiệt độ, áp suất.', 'Diện tích tiếp xúc.', 'Nồng độ.', 'Xúc tác.'],
+    correct: 2,
+    explanation: 'Thổi khí nén làm tăng nồng độ oxygen cung cấp cho quá trình cháy than cốc[cite: 1].'
+  },
+  {
+    id: 'q74', label: 'Câu 74',
+    question: 'Hằng số tốc độ $k$ trong biểu thức $v = k[A]^2[B]$ phụ thuộc vào yếu tố nào?',
+    options: ['Nồng độ chất A.', 'Nồng độ chất B.', 'Nhiệt độ của phản ứng.', 'Thời gian xảy ra phản ứng.'],
+    correct: 2,
+    explanation: 'Hằng số tốc độ $k$ chỉ phụ thuộc vào bản chất của chất phản ứng và nhiệt độ[cite: 1].'
+  },
+  {
+    id: 'q75', label: 'Câu 75',
+    question: 'Khi tăng áp suất, tốc độ phản ứng có chất khí tăng là do',
+    options: [
+      'Nồng độ của các chất khí tăng lên.',
+      'Nồng độ của các chất khí giảm xuống.',
+      'Chuyển động của các chất khí tăng lên.',
+      'Nồng độ của các chất khí không thay đổi.'
+    ],
+    correct: 0,
+    explanation: 'Khi nén khí (tăng áp suất), khoảng cách giữa các phân tử giảm, dẫn đến nồng độ tăng và tăng va chạm[cite: 1].'
+  },
+  {
+    id: 'q76', label: 'Câu 76',
+    question: 'Hiện tượng nào thể hiện ảnh hưởng của nhiệt độ đến tốc độ phản ứng?',
+    options: [
+      'Chẻ nhỏ củi để cháy nhanh hơn.',
+      'Quạt gió vào bếp than.',
+      'Thức ăn lâu bị ôi thiu khi để trong tủ lạnh.',
+      'Sử dụng enzyme trong phản ứng sinh hóa.'
+    ],
+    correct: 2,
+    explanation: 'Nhiệt độ thấp trong tủ lạnh làm giảm tốc độ các phản ứng phân hủy thức ăn[cite: 1].'
+  },
+  {
+    id: 'q77', label: 'Câu 77',
+    question: 'Khi diện tích bề mặt tăng, tốc độ phản ứng tăng đúng với phản ứng có chất nào?',
+    options: ['Chất lỏng.', 'Chất rắn.', 'Chất khí.', 'Cả 3 đều đúng.'],
+    correct: 1,
+    explanation: 'Diện tích bề mặt là yếu tố đặc trưng ảnh hưởng đến tốc độ phản ứng của chất rắn[cite: 1].'
+  },
+  {
+    id: 'q78', label: 'Câu 78',
+    question: 'Khi đốt củi, để tăng tốc độ cháy, người ta thường',
+    options: ['đốt trong lò kín.', 'xếp củi chặt khít.', 'thổi hơi nước.', 'thổi không khí khô.'],
+    correct: 3,
+    explanation: 'Thổi không khí (chứa $O_2$) làm tăng nồng độ chất phản ứng, giúp củi cháy nhanh hơn[cite: 1].'
+  },
+  {
+    id: 'q79', label: 'Câu 79',
+    question: 'Cho phản ứng: $Zn(r) + 2HCl(dd) \\to ZnCl_2 + H_2$. Nếu tăng nồng độ HCl thì',
+    options: [
+      'Số va chạm giảm, tốc độ tăng.',
+      'Số va chạm giảm, tốc độ giảm.',
+      'Số va chạm tăng, tốc độ tăng.',
+      'Số va chạm tăng, tốc độ giảm.'
+    ],
+    correct: 2,
+    explanation: 'Tăng nồng độ làm tăng mật độ phân tử, dẫn đến tăng số va chạm và tăng tốc độ phản ứng[cite: 1].'
+  },
+  {
+    id: 'q80', label: 'Câu 80',
+    question: 'Trường hợp nào sau đây tốc độ phản ứng giữa kẽm và $H_2SO_4$ KHÔNG đổi?',
+    options: [
+      'Thay kẽm viên bằng kẽm bột.',
+      'Thay $H_2SO_4$ 4M bằng $H_2SO_4$ 2M.',
+      'Thực hiện phản ứng ở $50^0C$.',
+      'Dùng dung dịch $H_2SO_4$ gấp đôi về thể tích nhưng cùng nồng độ.'
+    ],
+    correct: 3,
+    explanation: 'Nếu giữ nguyên nồng độ và các yếu tố khác, việc chỉ tăng thể tích dung dịch không làm thay đổi tốc độ phản ứng tức thời[cite: 1].'
+  },
+  {
+    id: 'q81', label: 'Câu 81',
+    question: 'Tại sao bột kẽm tan trong HCl nhanh hơn kẽm miếng?',
+    options: [
+      'Axit nhiều hơn.',
+      'Diện tích bề mặt bột kẽm lớn hơn.',
+      'Nồng độ kẽm bột lớn hơn.',
+      'Cả ba nguyên nhân đều sai.'
+    ],
+    correct: 1,
+    explanation: 'Bột kẽm có diện tích tiếp xúc với axit lớn hơn nhiều so với miếng kẽm cùng khối lượng[cite: 1].'
+  },
+  {
+    id: 'q82', label: 'Câu 82',
+    question: 'Khi đốt than trong lò, đậy nắp lò sẽ giữ than cháy được lâu hơn. Yếu tố được vận dụng là',
+    options: ['nhiệt độ.', 'nồng độ.', 'chất xúc tác.', 'diện tích bề mặt tiếp xúc.'],
+    correct: 1,
+    explanation: 'Hạn chế không khí (giảm nồng độ $O_2$) giúp kiểm soát tốc độ cháy[cite: 1].'
+  },
+  {
+    id: 'q83', label: 'Câu 83',
+    question: 'Điền vào chỗ trống: "Tốc độ phản ứng được xác định bởi độ biến thiên ...(1)... của ...(2)... trong một đơn vị ...(3)..."',
+    options: [
+      '(1) nồng độ, (2) một chất tham gia hoặc sản phẩm, (3) thể tích.',
+      '(1) nồng độ, (2) một chất tham gia hoặc sản phẩm, (3) thời gian.',
+      '(1) thời gian, (2) một chất sản phẩm, (3) nồng độ.',
+      '(1) thời gian, (2) các chất phản ứng, (3) thể tích.'
+    ],
+    correct: 1,
+    explanation: 'Định nghĩa tốc độ phản ứng dựa trên biến thiên nồng độ theo thời gian[cite: 1].'
+  },
+  {
+    id: 'q84', label: 'Câu 84',
+    question: 'Nhận định nào dưới đây là đúng?',
+    options: [
+      'Khi nhiệt độ tăng thì tốc độ phản ứng tăng.',
+      'Khi nhiệt độ tăng thì tốc độ phản ứng giảm.',
+      'Khi nhiệt độ giảm thì tốc độ phản ứng tăng.',
+      'Sự thay đổi nhiệt độ không ảnh hưởng đến tốc độ phản ứng.'
+    ],
+    correct: 0,
+    explanation: 'Theo quy tắc Van\'t Hoff, nhiệt độ tăng làm tăng tốc độ phản ứng[cite: 1].'
+  },
+  {
+    id: 'q85', label: 'Câu 85',
+    question: 'Phản ứng nào sau đây xảy ra nhanh nhất?',
+    options: ['Trung hòa acid - base.', 'Sắt bị gỉ.', 'Tinh bột lên men rượu.', 'Thức ăn bị ôi thiu.'],
+    correct: 0,
+    explanation: 'Phản ứng trung hòa acid - base là phản ứng giữa các ion, thường xảy ra tức thì[cite: 1].'
+  },
+  {
+    id: 'q86', label: 'Câu 86',
+    question: 'Khi nào tốc độ của phản ứng tăng?',
+    options: ['Nồng độ giảm.', 'Áp suất tăng.', 'Nhiệt độ giảm.', 'Diện tích bề mặt tiếp xúc giảm.'],
+    correct: 1,
+    explanation: 'Tăng áp suất (với chất khí) tương đương tăng nồng độ, làm tăng tốc độ phản ứng[cite: 1].'
+  },
+  {
+    id: 'q87', label: 'Câu 87',
+    question: 'Công thức tính tốc độ trung bình của phản ứng $X \\to Y$ trong khoảng thời gian $t_1$ đến $t_2$ là',
+    options: [
+      '$\\overline{v} = \\frac{C_1 - C_2}{t_1 - t_2}$',
+      '$\\overline{v} = \\frac{C_2 - C_1}{t_2 - t_1}$',
+      '$\\overline{v} = \\frac{C_1 - C_2}{t_2 - t_1}$',
+      '$\\overline{v} = -\\frac{C_1 - C_2}{t_2 - t_1}$'
+    ],
+    correct: 2,
+    explanation: 'Đối với chất tham gia, tốc độ trung bình bằng trị tuyệt đối của biến thiên nồng độ chia biến thiên thời gian: $|C_2-C_1|/(t_2-t_1) = (C_1-C_2)/(t_2-t_1)$[cite: 1].'
+  },
+  {
+    id: 'q88', label: 'Câu 88',
+    question: 'Việc đập nhỏ đá vôi ($CaCO_3$) thể hiện ảnh hưởng của yếu tố nào đến tốc độ phản ứng?',
+    options: ['Nồng độ.', 'Diện tích bề mặt.', 'Chất xúc tác.', 'Nhiệt độ.'],
+    correct: 1,
+    explanation: 'Đập nhỏ chất rắn làm tăng diện tích tiếp xúc với chất phản ứng khác[cite: 1].'
+  },
+  {
+    id: 'q89', label: 'Câu 89',
+    question: 'Bắt đầu phản ứng nồng độ là 0,024M. Sau 10s nồng độ là 0,022M. Tốc độ phản ứng là',
+    options: ['0,0003 mol/L.s.', '0,00025 mol/L.s.', '0,00015 mol/L.s.', '0,0002 mol/L.s.'],
+    correct: 3,
+    explanation: '$v = (0,024 - 0,022) / 10 = 0,0002$ (mol/L.s)[cite: 1].'
+  },
+  {
+    id: 'q90', label: 'Câu 90',
+    question: 'Khi nhiệt độ tăng $10^0C$ tốc độ tăng 2 lần. Tăng từ $20^0C$ lên $100^0C$ thì tốc độ tăng bao nhiêu?',
+    options: ['16 lần.', '256 lần.', '64 lần.', '14 lần.'],
+    correct: 1,
+    explanation: 'Số lần tăng = $2^{(100-20)/10} = 2^8 = 256$ lần[cite: 1].'
+  },
+  {
+    id: 'q91', label: 'Câu 91',
+    question: 'Đun nóng hỗn hợp bột Fe và HCl loãng. Phát biểu nào KHÔNG đúng?',
+    options: ['Khí $H_2$ thoát ra nhanh hơn.', 'Bột Fe tan nhanh hơn.', 'Lượng muối thu được nhiều hơn.', 'Nồng độ HCl giảm nhanh hơn.'],
+    correct: 2,
+    explanation: 'Đun nóng chỉ làm tăng tốc độ phản ứng, không làm tăng lượng sản phẩm tối đa (vốn phụ thuộc vào lượng chất tham gia ban đầu)[cite: 1].'
+  },
+  {
+    id: 'q92', label: 'Câu 92',
+    question: 'Phản ứng: $X + 2Y \\to Z + T$. Ban đầu $C_X=0,01M$, sau 20s $C_X=0,008M$. Tốc độ trung bình tính theo X là',
+    options: ['$4,0.10^{-4}$ mol/L.s.', '$1,0.10^{-4}$ mol/L.s.', '$7,5.10^{-4}$ mol/L.s.', '$5,0.10^{-4}$ mol/L.s.'],
+    correct: 1,
+    explanation: '$v = (0,01 - 0,008) / 20 = 1,0.10^{-4}$ (mol/L.s)[cite: 1].'
+  },
+  {
+    id: 'q93', label: 'Câu 93',
+    question: 'Tăng nhiệt độ thêm $50^0C$ tốc độ tăng 32 lần. Hệ số Van\'t Hoff của phản ứng là',
+    options: ['5.', '3.', '4.', '2.'],
+    correct: 3,
+    explanation: '$\\gamma^{50/10} = 32 \\Rightarrow \\gamma^5 = 32 \\Rightarrow \\gamma = 2$[cite: 1].'
+  },
+  {
+    id: 'q94', label: 'Câu 94',
+    question: 'Nhiệt độ tăng $10^0C$ tốc độ tăng 3 lần. Hỏi tốc độ tăng bao nhiêu lần khi nâng từ $30^0C$ lên $50^0C$?',
+    options: ['3 lần.', '6 lần.', '9 lần.', '27 lần.'],
+    correct: 2,
+    explanation: 'Số lần tăng = $3^{(50-30)/10} = 3^2 = 9$ lần[cite: 1].'
+  },
+  {
+    id: 'q95', label: 'Câu 95',
+    question: 'Hệ số Van\'t Hoff là 2. Tốc độ ở $600^0C$ so với $550^0C$ thay đổi thế nào?',
+    options: ['Tăng 16 lần.', 'Giảm 32 lần.', 'Tăng 32 lần.', 'Giảm 16 lần.'],
+    correct: 2,
+    explanation: 'Số lần tăng = $2^{(600-550)/10} = 2^5 = 32$ lần[cite: 1].'
+  },
+  {
+    id: 'q96', label: 'Câu 96',
+    question: 'Nhóm VIIA trong bảng tuần hoàn còn gọi là',
+    options: ['nhóm kim loại kiềm.', 'nhóm khí hiếm.', 'nhóm halogen.', 'nhóm kim loại kiềm thổ.'],
+    correct: 2,
+    explanation: 'Nhóm VIIA gồm các nguyên tố Fluorine, Chlorine, Bromine, Iodine... gọi là nhóm halogen[cite: 1].'
+  },
+  {
+    id: 'q97', label: 'Câu 97',
+    question: 'Số electron ở lớp ngoài cùng của mỗi nguyên tử halogen là',
+    options: ['7.', '6.', '8.', '5.'],
+    correct: 0,
+    explanation: 'Các nguyên tố halogen có cấu hình electron lớp ngoài cùng là $ns^2np^5$, tổng cộng 7 electron[cite: 1].'
+  },
+  {
+    id: 'q98', label: 'Câu 98',
+    question: 'Nguyên tố hóa học nào sau đây thuộc nhóm halogen?',
+    options: ['Chlorine.', 'Oxygen.', 'Nitrogen.', 'Carbon.'],
+    correct: 0,
+    explanation: 'Chlorine (Cl) là một nguyên tố thuộc nhóm halogen (VIIA)[cite: 1].'
+  },
+  {
+    id: 'q99', label: 'Câu 99',
+    question: 'Khi đun nóng, đơn chất thăng hoa từ rắn sang hơi màu tím là',
+    options: ['$F_2$.', '$I_2$.', '$Cl_2$.', '$Br_2$.'],
+    correct: 1,
+    explanation: 'Iodine ($I_2$) ở trạng thái rắn có thể thăng hoa thành hơi màu tím khi đun nóng[cite: 1].'
+  },
+  {
+    id: 'q100', label: 'Câu 100',
+    question: 'Halogen nào sau đây được dùng để khử trùng nước sinh hoạt?',
+    options: ['$F_2$.', '$I_2$.', '$Cl_2$.', '$Br_2$.'],
+    correct: 2,
+    explanation: 'Chlorine ($Cl_2$) được sử dụng rộng rãi để diệt khuẩn, khử trùng nước[cite: 1].'
+  },
+  {
+    id: 'q101', label: 'Câu 101',
+    question: 'Tính chất hóa học đặc trưng của các đơn chất halogen là',
+    options: ['Tính khử.', 'Tính oxi hóa.', 'Tính acid.', 'Tính base.'],
+    correct: 1,
+    explanation: 'Do có 7 electron lớp ngoài cùng, các halogen rất dễ nhận thêm 1 electron để đạt cấu hình bền, thể hiện tính oxi hóa mạnh[cite: 1].'
+  },
+  {
+    id: 'q102', label: 'Câu 102',
+    question: 'Chlorine chỉ thể hiện tính oxi hóa khi tác dụng với chất nào sau đây?',
+    options: ['O2.', 'H2O.', 'Fe.', 'NaOH.'],
+    correct: 2,
+    explanation: 'Khi tác dụng với kim loại như Fe, Cl2 chỉ thể hiện tính oxi hóa (số oxi hóa giảm từ 0 xuống -1).'
+  },
+  {
+    id: 'q103', label: 'Câu 103',
+    question: 'Phát biểu nào sau đây là không đúng khi nói về đơn chất nhóm VIIA?',
+    options: [
+      'Tính chất đặc trưng là tính oxi hoá.',
+      'Màu sắc đậm dần từ fluorine đến iodine.',
+      'Từ fluorine đến bromine rồi iodine, trạng thái của các đơn chất chuyển từ khí đến lỏng rồi rắn.',
+      'Khả năng phản ứng với nước tăng từ fluorine đến iodine.'
+    ],
+    correct: 3,
+    explanation: 'Khả năng phản ứng với nước giảm dần từ fluorine đến iodine.'
+  },
+  {
+    id: 'q104', label: 'Câu 104',
+    question: 'Phát biểu nào sau đây là không đúng khi nói về một số ứng dụng của đơn chất chlorine?',
+    options: [
+      'Khí chlorine có thể được dùng để tạo môi trường sát khuẩn cho nguồn nước cấp.',
+      'Khí chlorine phản ứng với dung dịch sodium hydroxide tạo dung dịch nước Javel.',
+      'Khí chlorine được sử dụng để sản xuất hydrogen chloride.',
+      'Do có độc tính, khí chlorine được sử dụng để trừ sâu trong nông nghiệp.'
+    ],
+    correct: 3,
+    explanation: 'Khí chlorine không được dùng trực tiếp làm thuốc trừ sâu trong nông nghiệp do độc tính cao và khó kiểm soát.'
+  },
+  {
+    id: 'q105', label: 'Câu 105',
+    question: 'Khí hydrogen chloride có công thức hóa học là',
+    options: ['HCl.', 'HClO2.', 'KCl.', 'NaClO.'],
+    correct: 0,
+    explanation: 'Công thức của hydrogen chloride là HCl.'
+  },
+  {
+    id: 'q106', label: 'Câu 106',
+    question: 'Kim loại nào sau đây không tan được trong dung dịch HCl?',
+    options: ['Al.', 'Ag.', 'Zn.', 'Mg.'],
+    correct: 1,
+    explanation: 'Ag là kim loại đứng sau hydrogen trong dãy hoạt động hóa học nên không phản ứng với dung dịch HCl.'
+  },
+  {
+    id: 'q107', label: 'Câu 107',
+    question: 'Oxide nào sau đây tác dụng với dung dịch HCl sinh ra hỗn hợp muối?',
+    options: ['Al2O3.', 'Fe3O4.', 'CaO.', 'Na2O.'],
+    correct: 1,
+    explanation: 'Fe3O4 tác dụng với HCl tạo ra hỗn hợp muối FeCl2 và FeCl3.'
+  },
+  {
+    id: 'q108', label: 'Câu 108',
+    question: 'Hiện tượng gì xảy ra khi thêm nước chlorine vào dung dịch KI có chứa hồ tinh bột?',
+    options: [
+      'không có hiện tượng gì.',
+      'Có hơi màu tím bay lên.',
+      'Dung dịch chuyển sang màu vàng.',
+      'Dung dịch có màu xanh đặc trưng.'
+    ],
+    correct: 3,
+    explanation: 'Cl2 đẩy I2 ra khỏi muối KI, I2 làm hồ tinh bột chuyển sang màu xanh.'
+  },
+  {
+    id: 'q109', label: 'Câu 109',
+    question: 'Nhỏ dung dịch nào vào AgNO3 thu được kết tủa màu vàng nhạt?',
+    options: ['HCl.', 'NaBr.', 'NaCl.', 'HF.'],
+    correct: 1,
+    explanation: 'AgNO3 + NaBr -> AgBr (kết tủa vàng nhạt) + NaNO3.'
+  },
+  {
+    id: 'q110', label: 'Câu 110',
+    question: 'Để phân biệt các dung dịch: NaF, NaCl, NaBr, NaI, ta dùng',
+    options: ['dung dịch HCl.', 'quỳ tím.', 'dung dịch BaCl2.', 'dung dịch AgNO3.'],
+    correct: 3,
+    explanation: 'AgNO3 tạo kết tủa khác màu: không (NaF), trắng (NaCl), vàng nhạt (NaBr), vàng đậm (NaI).'
+  },
+  {
+    id: 'q111', label: 'Câu 111',
+    question: 'Hydrogen halide có nhiệt độ sôi thấp nhất là',
+    options: ['HF.', 'HCl.', 'HBr.', 'HI.'],
+    correct: 1,
+    explanation: 'HCl có nhiệt độ sôi thấp nhất do HF có liên kết hydrogen còn HBr, HI có tương tác van der Waals lớn.'
+  },
+  {
+    id: 'q112', label: 'Câu 112',
+    question: 'Cấu hình e lớp ngoài cùng của các nguyên tử các nguyên tố halogen là',
+    options: ['ns2np4.', 'ns2np5.', 'ns2np3.', 'ns2np6.'],
+    correct: 1,
+    explanation: 'Halogen thuộc nhóm VIIA nên có cấu hình e lớp ngoài cùng là ns2np5.'
+  },
+  {
+    id: 'q113', label: 'Câu 113',
+    question: 'Liên kết trong các phân tử đơn chất halogen là',
+    options: ['cộng hóa trị không cực.', 'cộng hóa trị có cực.', 'liên kết ion.', 'liên kết cho nhận.'],
+    correct: 0,
+    explanation: 'Các phân tử X2 được tạo từ 2 nguyên tử giống nhau nên là liên kết cộng hóa trị không cực.'
+  },
+  {
+    id: 'q114', label: 'Câu 114',
+    question: 'Đặc điểm chung của đơn chất halogen là',
+    options: [
+      'Có tính oxi hóa mạnh.',
+      'Vừa có tính oxi hóa vừa có tính khử.',
+      'Ở điều kiện thường là chất khí.',
+      'Tác dụng mạnh với nước.'
+    ],
+    correct: 0,
+    explanation: 'Tất cả halogen đều có tính oxi hóa mạnh do có 7e lớp ngoài cùng.'
+  },
+  {
+    id: 'q115', label: 'Câu 115',
+    question: 'Chlorine không phản ứng với dung dịch nào sau đây',
+    options: ['NaOH.', 'NaCl.', 'NaBr.', 'NaI.'],
+    correct: 1,
+    explanation: 'Chlorine không phản ứng với muối của chính nó.'
+  },
+  {
+    id: 'q116', label: 'Câu 116',
+    question: 'Trường hợp nào không xảy ra phản ứng hóa học?',
+    options: [
+      'Sục khí Cl2 vào dung dịch FeCl2.',
+      'Cho I2 vào dung dịch NaBr.',
+      'Cho Fe vào dung dịch HCl đặc, nguội.',
+      'Sục khí Cl2 vào dung dịch NaBr.'
+    ],
+    correct: 1,
+    explanation: 'I2 có tính oxi hóa yếu hơn Br2 nên không đẩy được Br2 ra khỏi muối.'
+  },
+  {
+    id: 'q117', label: 'Câu 117',
+    question: 'Ứng dụng nào sau đây không phải của Cl2?',
+    options: ['Xử lí nước bể bơi.', 'Sát trùng vết thương trong y tế.', 'Sản xuất nhựa PVC.', 'Sản xuất bột tẩy trắng.'],
+    correct: 1,
+    explanation: 'Trong y tế thường dùng cồn hoặc nước oxy già để sát trùng vết thương thay vì khí Cl2 trực tiếp.'
+  },
+  {
+    id: 'q118', label: 'Câu 118',
+    question: 'Muối nào có nhiều nhất trong nước biển với nồng độ khoảng 3%?',
+    options: ['NaCl.', 'NaF.', 'CaCl2.', 'NaBr.'],
+    correct: 0,
+    explanation: 'NaCl (muối ăn) là thành phần chính của muối biển.'
+  },
+  {
+    id: 'q119', label: 'Câu 119',
+    question: 'Chỉ thị nào sau đây thường dùng để nhận biết dung dịch I2?',
+    options: ['Phenolphtalein.', 'Hồ tinh bột.', 'Quỳ tím.', 'Nước vôi trong.'],
+    correct: 1,
+    explanation: 'I2 làm hồ tinh bột chuyển sang màu xanh lục đặc trưng.'
+  },
+  {
+    id: 'q120', label: 'Câu 120',
+    question: 'Nước Javen là hỗn hợp của các chất nào sau đây?',
+    options: ['HCl, HClO, H2O.', 'NaCl, NaClO, H2O.', 'NaCl, NaClO3, H2O.', 'NaCl, NaClO4, H2O.'],
+    correct: 1,
+    explanation: 'Nước Javen thu được khi sục Cl2 vào dung dịch NaOH, chứa NaCl và NaClO.'
+  },
+  {
+    id: 'q121', label: 'Câu 121',
+    question: 'Trong 4 đơn chất F2, Cl2, Br2, I2. Chất có nhiệt độ sôi cao nhất là:',
+    options: ['F2.', 'Cl2.', 'Br2.', 'I2.'],
+    correct: 3,
+    explanation: 'Trong nhóm halogen, nhiệt độ sôi tăng dần từ F2 đến I2.'
+  },
+  {
+    id: 'q122', label: 'Câu 122',
+    question: 'Muối iot là muối ăn có chứa thêm lượng nhỏ iot ở dạng',
+    options: ['I2.', 'MgI2.', 'CaI2.', 'KI hoặc KIO3.'],
+    correct: 3,
+    explanation: 'Iot trong muối ăn thường được bổ sung dưới dạng muối KI hoặc KIO3.'
+  },
+  {
+    id: 'q123', label: 'Câu 123',
+    question: 'Dãy nào sau đây sắp xếp các chất theo thứ tự giảm dần tính acid?',
+    options: [
+      'HI > HBr > HCl > HF',
+      'HF > HCl > HBr > HI',
+      'HCl > HBr > HF > HI',
+      'HCl > HBr > HI > HF'
+    ],
+    correct: 0,
+    explanation: 'Tính acid của các HX tăng dần từ HF đến HI.'
+  },
+  {
+    id: 'q124', label: 'Câu 124',
+    question: 'Phản ứng nào sau đây minh họa tính khử của dung dịch HCl?',
+    options: [
+      '2HCl + Fe -> FeCl2 + H2',
+      '16HCl + 2KMnO4 -> 2KCl + 2MnCl2 + 5Cl2 + 8H2O',
+      '2HCl + CaCO3 -> CaCl2 + CO2 + H2O',
+      '6HCl + Al2O3 -> 2AlCl3 + 3H2O'
+    ],
+    correct: 1,
+    explanation: 'Trong phản ứng với KMnO4, số oxi hóa của Cl trong HCl tăng từ -1 lên 0, thể hiện tính khử.'
+  },
+  {
+    id: 'q125', label: 'Câu 125',
+    question: 'Cho dung dịch AgNO3 vào muối X thấy có kết tủa trắng. X là',
+    options: ['KI.', 'AgCl.', 'NaBr.', 'MgCl2.'],
+    correct: 3,
+    explanation: 'AgNO3 + MgCl2 tạo ra kết tủa AgCl màu trắng.'
+  },
+  {
+    id: 'q126', label: 'Câu 126',
+    question: 'Ứng dụng nào dưới đây không phải của muối ăn?',
+    options: ['Bảo quản thực phẩm.', 'Dùng làm nước muối sinh lí.', 'Dùng để tráng phim ảnh.', 'Cân bằng điện giải.'],
+    correct: 2,
+    explanation: 'AgBr mới được dùng để tráng phim ảnh, không phải NaCl.'
+  },
+  {
+    id: 'q127', label: 'Câu 127',
+    question: 'Hiện tượng cho nước chlorine vào dung dịch sodium bromide là',
+    options: ['tạo ra dung dịch màu tím đen.', 'tạo ra dung dịch màu vàng tươi.', 'thấy có khí thoát ra.', 'tạo ra dung dịch màu vàng nâu.'],
+    correct: 3,
+    explanation: 'Cl2 đẩy Br2 ra khỏi muối làm dung dịch có màu vàng nâu của Br2.'
+  },
+  {
+    id: 'q128', label: 'Câu 128',
+    question: 'Từ HF đến HI, tính acid của các dung dịch biến đổi như thế nào?',
+    options: ['Tăng dần.', 'Giảm dần.', 'Tăng sau đó giảm.', 'Không xác định được.'],
+    correct: 0,
+    explanation: 'Lực acid tăng dần: HF < HCl < HBr < HI.'
+  },
+  {
+    id: 'q129', label: 'Câu 129',
+    question: 'Phát biểu nào sau đây không đúng?',
+    options: [
+      'HF là acid yếu.',
+      'Hầu hết các muối halide đều dễ tan trong nước.',
+      'Từ fluorine đến iodine nhiệt độ nóng chảy tăng dần, nhiệt độ sôi giảm dần.',
+      'Fluorine chỉ có số oxi hoá -1 trong hợp chất.'
+    ],
+    correct: 2,
+    explanation: 'Từ fluorine đến iodine, cả nhiệt độ nóng chảy và nhiệt độ sôi đều tăng dần.'
+  },
+  {
+    id: 'q130', label: 'Câu 130',
+    question: 'Chlorine vừa là chất oxi hoá, vừa là chất khử trong phản ứng nào?',
+    options: [
+      'Cl2 + 2NaOH -> NaCl + NaClO + H2O',
+      '2KMnO4 + 16HCl -> 2KCl + 2MnCl2 + 5Cl2 + 8H2O',
+      'HCl + NaOH -> NaCl + H2O',
+      'H2 + Cl2 -> 2HCl'
+    ],
+    correct: 0,
+    explanation: 'Cl(0) vừa giảm xuống -1 (NaCl) vừa tăng lên +1 (NaClO).'
+  },
+  {
+    id: 'q131', label: 'Câu 131',
+    question: 'Hydrogen halide nào sau đây có nhiệt độ sôi cao nhất?',
+    options: ['HCl.', 'HF.', 'HBr.', 'HI.'],
+    correct: 1,
+    explanation: 'HF có nhiệt độ sôi cao bất thường do hình thành liên kết hydrogen giữa các phân tử.'
+  },
+  {
+    id: 'q132', label: 'Câu 132',
+    question: 'Halogen nào sau đây thể lỏng ở điều kiện thường?',
+    options: ['Fluorine.', 'Chlorine.', 'Bromine.', 'Iodine.'],
+    correct: 2,
+    explanation: 'Bromine là halogen duy nhất ở trạng thái lỏng ở điều kiện thường.'
+  },
+  {
+    id: 'q133', label: 'Câu 133',
+    question: 'Dung dịch silver nitrate không tác dụng với dung dịch nào sau đây?',
+    options: ['KI.', 'NaBr.', 'HCl.', 'NaF.'],
+    correct: 3,
+    explanation: 'AgF là muối tan nên không tạo kết tủa với AgNO3.'
+  },
+  {
+    id: 'q134', label: 'Câu 134',
+    question: 'Hydrogen halide là',
+    options: [
+      'đơn chất halogen (X2);',
+      'hợp chất của hydrogen với halogen (HX);',
+      'hợp chất của hydrogen với chlorine (HCl);',
+      'hợp chất của hydrogen với halogen và oxygen (HXO).'
+    ],
+    correct: 1,
+    explanation: 'Hydrogen halide là hợp chất có công thức tổng quát HX.'
+  },
+  {
+    id: 'q135', label: 'Câu 135',
+    question: 'Acid nào sau đây có khả năng ăn mòn thủy tinh vô cơ?',
+    options: ['HI.', 'HBr.', 'HCl.', 'HF.'],
+    correct: 3,
+    explanation: 'HF phản ứng với SiO2 trong thủy tinh: SiO2 + 4HF -> SiF4 + 2H2O.'
+  },
+  {
+    id: 'q136', label: 'Câu 136',
+    question: 'Nguyên tố nào sau đây không phải là nguyên tố halogen?',
+    options: ['Fluorine.', 'Bromine.', 'Oxygen.', 'Iodine.'],
+    correct: 2,
+    explanation: 'Oxygen thuộc nhóm VIA, không phải halogen.'
+  },
+  {
+    id: 'q137', label: 'Câu 137',
+    question: 'Đơn chất halogen ở điều kiện thường có màu vàng lục là',
+    options: ['F2.', 'Cl2.', 'Br2.', 'I2.'],
+    correct: 1,
+    explanation: 'Chlorine (Cl2) là chất khí có màu vàng lục.'
+  },
+  {
+    id: 'q138', label: 'Câu 138',
+    question: 'Phát biểu đúng là',
+    options: [
+      'Tính oxi hóa tăng dần từ fluorine đến iodine.',
+      'Tính khử tăng dần từ fluorine đến iodine.',
+      'Tính khử mạnh, giảm dần từ fluorine đến iodine.',
+      'Tính oxi hóa mạnh, giảm dần từ fluorine đến iodine.'
+    ],
+    correct: 3,
+    explanation: 'Tính oxi hóa giảm dần khi đi từ đầu nhóm xuống cuối nhóm (F2 > Cl2 > Br2 > I2).'
+  },
+  {
+    id: 'q139', label: 'Câu 139',
+    question: 'Dung dịch Br2 có thể phản ứng được với dung dịch nào sau đây?',
+    options: ['NaF.', 'NaCl.', 'NaBr.', 'NaI.'],
+    correct: 3,
+    explanation: 'Br2 mạnh hơn I2 nên đẩy được I2 ra khỏi muối NaI.'
+  },
+  {
+    id: 'q140', label: 'Câu 140',
+    question: 'Phản ứng nào dưới đây chứng minh tính khử của các ion halide?',
+    options: [
+      'BaCl2 + H2SO4 -> BaSO4 + 2HCl',
+      'HI + NaOH -> NaI + H2O',
+      '2HBr + H2SO4 -> Br2 + SO2 + 2H2O',
+      'CaO + 2HCl -> CaCl2 + H2O'
+    ],
+    correct: 2,
+    explanation: 'Trong phản ứng với H2SO4, số oxi hóa của Br trong HBr tăng từ -1 lên 0.'
+  },
+  {
+    id: 'q141', label: 'Câu 141',
+    question: 'Cho 21 gam NaI vào 100ml dung dịch Br2 0,5M. Khối lượng NaBr thu được là',
+    options: ['6,9.', '9,34.', '10,3.', '17,5.'],
+    correct: 2,
+    explanation: 'nNaI = 0,14 mol; nBr2 = 0,05 mol. Br2 hết -> nNaBr = 2 * nBr2 = 0,1 mol -> m = 10,3g.'
+  },
+  {
+    id: 'q142', label: 'Câu 142',
+    question: 'Cho 4,8 gam kim loại R nhóm IIA tác dụng HCl thu được 4,958 lít H2 (đkc). Kim loại R là',
+    options: ['Mg.', 'Al.', 'Zn.', 'Fe.'],
+    correct: 0,
+    explanation: 'nR = nH2 = 4,958 / 24,79 = 0,2 mol. M = 4,8 / 0,2 = 24 (Mg).'
+  },
+  {
+    id: 'q143', label: 'Câu 143',
+    question: 'Đốt 3,24g kim loại R trong chlorine dư, thể tích Cl2 giảm 4,4622 lít (đkc). Kim loại R là',
+    options: ['Mg.', 'Al.', 'Zn.', 'Fe.'],
+    correct: 1,
+    explanation: 'nCl2 = 0,18 mol. Dựa trên bảo toàn e và khối lượng, R là Al (hóa trị III).'
+  },
+  {
+    id: 'q144', label: 'Câu 144',
+    question: 'Cho chlorine dư tác dụng với 9,2g kim loại hóa trị I sinh ra 23,4g muối. Muối thu được là',
+    options: ['NaCl.', 'KCl.', 'LiCl.', 'AgCl.'],
+    correct: 0,
+    explanation: 'nKim loại = nMuối. 9,2/R = 23,4/(R + 35,5) -> R = 23 (Na). Muối là NaCl.'
+  }
+];
+
+// ── RUNTIME ──
+window.addEventListener('DOMContentLoaded', () => {
+  questions = [...questionsData];
+  document.getElementById('btn-start').addEventListener('click', startQuiz);
+  document.getElementById('btn-next').addEventListener('click', nextQuestion);
+  document.addEventListener('mousemove', e => {
+    const g = document.getElementById('glow');
+    g.style.left = e.clientX + 'px';
+    g.style.top = e.clientY + 'px';
+  });
+});
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startQuiz() {
+  questions = [...questionsData];
+  qIdx = 0; answers = [];
+  showScreen('quiz-screen');
+  document.getElementById('cur-mode-badge').textContent = 'Trắc nghiệm – 30 câu';
+  document.getElementById('q-total').textContent = questions.length;
+  buildSegProgress();
+  renderQuestion();
+}
+
+function buildSegProgress() {
+  const el = document.getElementById('seg-progress');
+  el.innerHTML = '';
+  const total = questions.length;
+  const maxW = Math.max(3, Math.min(14, Math.floor(860 / total) - 3));
+  questions.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'seg-dot' + (i === 0 ? ' current' : '');
+    d.id = 'seg-' + i;
+    d.style.maxWidth = maxW + 'px';
+    el.appendChild(d);
+  });
+}
+
+function updateSegProgress(idx, result) {
+  const d = document.getElementById('seg-' + idx);
+  if (d) { d.classList.remove('current'); d.classList.add(result ? 'correct' : 'wrong'); }
+  const next = document.getElementById('seg-' + (idx + 1));
+  if (next) next.classList.add('current');
+}
+
+function renderQuestion() {
+  const q = questions[qIdx];
+  const total = questions.length;
+  document.getElementById('q-cur').textContent = qIdx + 1;
+  document.getElementById('progress-bar').style.width = ((qIdx / total) * 100) + '%';
+  document.getElementById('feedback-box').className = 'feedback-box';
+  document.getElementById('feedback-box').innerHTML = '';
+  document.getElementById('btn-next').className = 'btn-next';
+
+  const layout = document.getElementById('quiz-layout');
+  const passagePanel = document.getElementById('passage-panel');
+  passagePanel.style.display = 'none';
+  layout.classList.add('no-passage');
+
+  document.getElementById('q-label').textContent = q.label;
+  document.getElementById('q-text').innerHTML = q.question;
+
+  const content = document.getElementById('q-content');
+  content.innerHTML = '';
+  renderMCQuestion(q, content);
+
+  if (window.renderMathInElement) {
+    renderMathInElement(document.getElementById('quiz-layout'), {
+      delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],
+      throwOnError: false
+    });
+  }
+}
+
+function renderMCQuestion(q, content) {
+  const div = document.createElement('div');
+  div.className = 'options';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="opt-label">${LABELS[i]}</span><span>${opt}</span>`;
+    btn.addEventListener('click', () => selectAnswer(q, i));
+    div.appendChild(btn);
+  });
+  content.appendChild(div);
+}
+
+function selectAnswer(q, chosen) {
+  const isCorrect = chosen === q.correct;
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach((btn, i) => {
+    if (i === q.correct) btn.classList.add('correct');
+    else if (i === chosen && !isCorrect) btn.classList.add('wrong');
+    else btn.classList.add('disabled-plain');
+  });
+  answers.push({ correct: isCorrect, given: LABELS[chosen], correctAnswer: LABELS[q.correct] + '. ' + q.options[q.correct], question: q.question, explanation: q.explanation || '' });
+  updateSegProgress(qIdx, isCorrect);
+  const fb = document.getElementById('feedback-box');
+  if (isCorrect) {
+    fb.className = 'feedback-box correct-fb show';
+    fb.innerHTML = `<span>✅</span><div><b>Chính xác!</b><div class="feedback-explanation">💡 ${q.explanation || ''}</div></div>`;
+  } else {
+    fb.className = 'feedback-box wrong-fb show';
+    fb.innerHTML = `<span>❌</span><div><b>Sai rồi!</b> Đáp án đúng: <b>${LABELS[q.correct]}. ${q.options[q.correct]}</b><div class="feedback-explanation">💡 ${q.explanation || ''}</div></div>`;
+  }
+  document.getElementById('btn-next').className = 'btn-next show';
+  if (window.renderMathInElement) {
+    renderMathInElement(document.getElementById('feedback-box'), {
+      delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],
+      throwOnError: false
+    });
+  }
+}
+
+function nextQuestion() {
+  qIdx++;
+  if (qIdx >= questions.length) showResult(); else renderQuestion();
+}
+
+function showResult() {
+  showScreen('result-screen');
+  const correct = answers.filter(a => a.correct).length;
+  const total = answers.length;
+  const pct = Math.round((correct / total) * 100);
+  document.getElementById('rs-correct').textContent = correct;
+  document.getElementById('rs-wrong').textContent = total - correct;
+  document.getElementById('rs-total').textContent = total;
+  document.getElementById('ring-pct').textContent = pct + '%';
+  const circumference = 2 * Math.PI * 65;
+  const ring = document.getElementById('ring-fill');
+  ring.style.strokeDasharray = circumference;
+  ring.style.strokeDashoffset = circumference;
+  setTimeout(() => {
+    ring.style.strokeDashoffset = circumference * (1 - pct / 100);
+    ring.style.stroke = pct >= 80 ? '#3fb950' : pct >= 60 ? '#f0883e' : '#f85149';
+  }, 100);
+  document.getElementById('ring-pct').style.color = pct >= 80 ? '#3fb950' : pct >= 60 ? '#f0883e' : '#f85149';
+  const titles = pct === 100 ? ['🏆 Hoàn hảo!', 'Bạn đã trả lời đúng tất cả 30 câu!']
+    : pct >= 80 ? ['🎉 Xuất sắc!', `Kết quả rất tốt: ${correct}/${total} câu đúng.`]
+    : pct >= 60 ? ['👍 Khá tốt!', `Cần ôn thêm: ${correct}/${total} câu đúng.`]
+    : ['📚 Cần cố gắng thêm!', `Hãy xem lại bài: ${correct}/${total} câu đúng.`];
+  document.getElementById('result-title').textContent = titles[0];
+  document.getElementById('result-sub').textContent = titles[1];
+  const reviewList = document.getElementById('review-list');
+  reviewList.innerHTML = '';
+  const wrongOnes = answers.filter(a => !a.correct);
+  if (wrongOnes.length === 0) {
+    reviewList.innerHTML = '<p style="color:var(--green);font-weight:600;">🎊 Không có câu nào sai!</p>';
+  } else {
+    wrongOnes.forEach(a => {
+      const div = document.createElement('div');
+      div.className = 'review-item';
+      div.innerHTML = `<div class="ri-q">${a.question}</div>
+        <div class="ri-row ri-wrong-ans">✗ Bạn chọn: ${a.given}</div>
+        <div class="ri-row ri-right-ans">✓ Đáp án đúng: ${a.correctAnswer}</div>
+        ${a.explanation ? `<div class="ri-row" style="color:var(--muted);font-size:0.78rem;">💡 ${a.explanation}</div>` : ''}`;
+      reviewList.appendChild(div);
+    });
+  }
+}
+</script>
+</body>
+</html>
